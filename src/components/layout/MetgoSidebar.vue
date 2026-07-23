@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import {
@@ -15,8 +15,10 @@ import {
   Home,
   UserCog,
 } from 'lucide-vue-next'
+import siteConfig from '@/site.config.js'
 
-const STORAGE_KEY = 'metgo_paine_sidebar_groups_v2'
+const site = inject('site', siteConfig)
+const STORAGE_KEY = `${site.storagePrefix || 'metgo'}_sidebar_groups_v2`
 
 const store = useStore()
 const route = useRoute()
@@ -41,7 +43,9 @@ const gruposDef = [
     match: (path) => path.startsWith('/meteo') || path.startsWith('/lugar'),
     items: [
       { to: '/meteo', label: 'Meteorología', icon: CloudSun, exact: true },
-      { to: '/meteo/precipitacion', label: 'Precipitación', icon: CloudRain },
+      ...(site.modules?.precipitacion !== false
+        ? [{ to: '/meteo/precipitacion', label: 'Precipitación', icon: CloudRain }]
+        : []),
     ],
   },
   {
@@ -147,10 +151,10 @@ function linkIsActive(link) {
 <template>
   <aside class="sidebar" aria-label="Navegación principal">
     <div class="sidebar__brand">
-      <span class="sidebar__mark">M</span>
+      <span class="sidebar__mark">{{ (site.productName || 'M').charAt(0) }}</span>
       <div class="sidebar__brand-text">
-        <span class="sidebar__name">METGO</span>
-        <span class="sidebar__sub">Paine</span>
+        <span class="sidebar__name">{{ site.productName }}</span>
+        <span class="sidebar__sub">{{ site.siteLabel }}</span>
       </div>
     </div>
 
@@ -197,7 +201,7 @@ function linkIsActive(link) {
 
     <footer class="sidebar__footer">
       <span>Torres del Paine</span>
-      <span class="sidebar__ver">v2.1 · METGO Glaciares</span>
+      <span class="sidebar__ver">{{ site.versionLabel }}</span>
     </footer>
   </aside>
 </template>

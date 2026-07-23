@@ -22,8 +22,10 @@
   "author": "METGO 3D SpA",
   "license": "ISC",
   "dependencies": {
+    "echarts": "^6.1.0",
     "lucide-vue-next": "^0.574.0",
     "vue": "^3.4.15",
+    "vue-echarts": "^8.0.1",
     "vue-router": "^4.2.5",
     "vuex": "^4.1.0"
   },

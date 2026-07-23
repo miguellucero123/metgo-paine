@@ -2,7 +2,7 @@
   <div class="detalle-view">
     <div class="container">
       <!-- BotÃ³n volver -->
-      <router-link to="/" class="back-button">
+      <router-link to="/meteo" class="back-button">
         â† Volver al inicio
       </router-link>
 
@@ -11,7 +11,7 @@
         <div class="error-icon"><Frown :size="64" /></div>
         <h2>Lugar no encontrado</h2>
         <p>El lugar que buscas no existe o ha sido eliminado</p>
-        <router-link to="/" class="btn-primary">
+        <router-link to="/meteo" class="btn-primary">
           Volver al inicio
         </router-link>
       </div>
@@ -109,66 +109,19 @@
         <section class="estadisticas-section">
           <h2 class="section-title"><BarChart2 :size="28" /> EstadÃ­sticas de la Semana</h2>
           
-          <!-- GrÃ¡fico de Tendencia de Temperatura (SVG) -->
-          <div class="trend-chart-container glass-card mb-4" v-if="chartData.points.length > 0">
-            <h3>Tendencia de Temperatura</h3>
-            <div class="chart-wrapper">
-              <svg viewBox="0 0 800 200" class="temp-chart">
-                <!-- Grid Lines -->
-                <line x1="0" y1="50" x2="800" y2="50" stroke="rgba(255,255,255,0.1)" />
-                <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(255,255,255,0.1)" />
-                <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.1)" />
-                
-                <!-- Max Temp Line -->
-                <polyline 
-                  fill="none" 
-                  stroke="#f5576c" 
-                  stroke-width="3" 
-                  :points="chartData.maxPoints" 
-                />
-                <!-- Min Temp Line -->
-                <polyline 
-                  fill="none" 
-                  stroke="#4facfe" 
-                  stroke-width="3" 
-                  :points="chartData.minPoints" 
-                />
-                
-                <!-- Data Points Max -->
-                <circle 
-                  v-for="(point, i) in chartData.points" 
-                  :key="`max-${i}`" 
-                  :cx="point.x" 
-                  :cy="point.yMax" 
-                  r="4" 
-                  fill="#f5576c" 
-                />
-                <!-- Data Points Min -->
-                 <circle 
-                  v-for="(point, i) in chartData.points" 
-                  :key="`min-${i}`" 
-                  :cx="point.x" 
-                  :cy="point.yMin" 
-                  r="4" 
-                  fill="#4facfe" 
-                />
-                
-                <!-- Labels -->
-                 <text 
-                  v-for="(point, i) in chartData.points" 
-                  :key="`label-${i}`" 
-                  :x="point.x" 
-                  y="190" 
-                  fill="white" 
-                  text-anchor="middle" 
-                  font-size="12"
-                >{{ point.day.substring(0, 3) }}</text>
-              </svg>
-            </div>
-            <div class="chart-legend">
-              <span class="legend-item"><span class="dot max"></span> MÃ¡xima</span>
-              <span class="legend-item"><span class="dot min"></span> MÃ­nima</span>
-            </div>
+          <div class="trend-chart-container card mb-4" v-if="serieLabels.length">
+            <h3>Tendencia de temperatura</h3>
+            <TimeSeriesChart
+              :labels="serieLabels"
+              :values="serieMax"
+              :values-min="serieMin"
+              show-band
+              unit="°"
+              :height="240"
+              series-max-label="Máxima"
+              series-min-label="Mínima"
+              export-name="tendencia_tdp"
+            />
           </div>
 
           <div class="stats-grid">
@@ -564,28 +517,14 @@ export default {
       
       return precauciones;
     },
-    chartData() {
-      if (!this.lugar) return { points: [], maxPoints: '', minPoints: '' };
-      
-      const points = this.lugar.pronosticoSemanal.map((dia, index) => {
-        const x = (index * 100) + 50; // Spacing
-        // Map temp to Y (assuming range -5 to 25 approx for plotting comfortably)
-        // 0 at 180, 20 at 20
-        const scaleY = (temp) => 180 - ((temp + 5) * 6); 
-        return {
-          day: dia.dia,
-          x,
-          yMax: scaleY(dia.max),
-          yMin: scaleY(dia.min),
-          max: dia.max,
-          min: dia.min
-        };
-      });
-
-      const maxPoints = points.map(p => `${p.x},${p.yMax}`).join(' ');
-      const minPoints = points.map(p => `${p.x},${p.yMin}`).join(' ');
-
-      return { points, maxPoints, minPoints };
+    serieLabels() {
+      return (this.lugar?.pronosticoSemanal || []).map((d) => d.dia);
+    },
+    serieMax() {
+      return (this.lugar?.pronosticoSemanal || []).map((d) => d.max);
+    },
+    serieMin() {
+      return (this.lugar?.pronosticoSemanal || []).map((d) => d.min);
     },
     formattedLastUpdate() {
       if (!this.lastUpdate) return '';

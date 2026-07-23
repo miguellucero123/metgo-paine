@@ -83,11 +83,23 @@
 
     <section class="card quick-links">
       <h2 class="section-title">Accesos rápidos</h2>
+      <p v-if="dataSource" class="muted source-line">Fuente datos: {{ dataSource }}</p>
       <div class="links">
         <router-link to="/meteo" class="link-chip">Meteorología</router-link>
         <router-link to="/meteo/precipitacion" class="link-chip">Precipitación</router-link>
         <router-link to="/estado" class="link-chip">Estado sistema</router-link>
       </div>
+    </section>
+
+    <section v-if="destacado && comboLabels.length" class="card combo-section">
+      <h2 class="section-title">Pronóstico 7 días · {{ destacado.nombre }}</h2>
+      <ComboMeteoChart
+        :labels="comboLabels"
+        :temperaturas="comboTemps"
+        :precipitacion="comboPrecip"
+        :temp-unit="`°${tempUnit}`"
+        export-name="combo_paine"
+      />
     </section>
   </div>
 </template>
@@ -96,10 +108,11 @@
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { MapPin, Thermometer, CloudRain, Wind, RefreshCw } from 'lucide-vue-next'
 import { celsiusToFahrenheit } from '@utils/helpers.js'
+import ComboMeteoChart from '@components/charts/ComboMeteoChart.vue'
 
 export default {
   name: 'DashboardView',
-  components: { MapPin, Thermometer, CloudRain, Wind, RefreshCw },
+  components: { MapPin, Thermometer, CloudRain, Wind, RefreshCw, ComboMeteoChart },
   computed: {
     ...mapState(['preferences']),
     ...mapGetters(['weatherLugares', 'weatherLoading', 'weatherError', 'weatherLastUpdate']),
@@ -151,6 +164,25 @@ export default {
     },
     destacado() {
       return this.lugares.find((l) => l.nombre?.includes('Torres')) || this.lugares[0] || null
+    },
+    dataSource() {
+      try {
+        return localStorage.getItem('weather_data_source') || '—'
+      } catch {
+        return '—'
+      }
+    },
+    comboLabels() {
+      return (this.destacado?.pronosticoSemanal || []).map((d) => d.dia)
+    },
+    comboTemps() {
+      return (this.destacado?.pronosticoSemanal || []).map((d) =>
+        this.tempUnit === 'F' ? Math.round(celsiusToFahrenheit(d.max)) : d.max
+      )
+    },
+    comboPrecip() {
+      // Open-Meteo probability % → approx mm visual (keep as %)
+      return (this.destacado?.pronosticoSemanal || []).map((d) => Number(d.precipitacion) || 0)
     },
   },
   methods: {
@@ -291,13 +323,12 @@ export default {
   border-color: var(--color-primary);
 }
 
-.spin {
-  animation: spin 1s linear infinite;
+.source-line {
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.combo-section {
+  margin-top: var(--space-lg);
 }
 </style>

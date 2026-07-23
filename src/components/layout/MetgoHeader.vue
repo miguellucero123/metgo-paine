@@ -1,9 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { MapPin, LogOut, Settings, Sun, Moon, Activity } from 'lucide-vue-next'
+import siteConfig from '@/site.config.js'
 
+const site = inject('site', siteConfig)
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -36,10 +38,10 @@ function logout() {
   <header class="header">
     <div class="header__left">
       <div class="header__title-block">
-        <h1 class="header__title">Sistema de monitoreo</h1>
+        <h1 class="header__title">{{ site.copy?.headerTitle || 'Sistema de monitoreo' }}</h1>
         <p class="header__subtitle">
           <MapPin class="header__pin" aria-hidden="true" />
-          Torres del Paine · Circuitos W y O
+          {{ site.tagline }}
         </p>
       </div>
     </div>

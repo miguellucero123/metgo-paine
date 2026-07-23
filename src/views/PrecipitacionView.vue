@@ -30,49 +30,29 @@
       </div>
     </section>
 
-    <div class="card table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Lugar</th>
-            <th>Circuito</th>
-            <th>Precip. hoy</th>
-            <th>Viento</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in filas" :key="row.id">
-            <td>{{ row.nombre }}</td>
-            <td>
-              <span class="badge" :class="row.circuito === 'W' ? 'badge--neutral' : 'badge--warning'">
-                {{ row.circuito }}
-              </span>
-            </td>
-            <td>
-              <div class="bar-cell">
-                <div class="bar" :style="{ width: `${row.precip}%` }" />
-                <span>{{ row.precip }}%</span>
-              </div>
-            </td>
-            <td>{{ row.viento }} km/h</td>
-            <td>
-              <router-link :to="`/lugar/${row.id}`" class="btn btn-sm btn--ghost">Ver</router-link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <section class="card chart-card">
+      <h2 class="section-title">Ranking por lugar</h2>
+      <HorizontalBarChart
+        :labels="barLabels"
+        :values="barValues"
+        :station-ids="barIds"
+        unit="%"
+        kind="precip"
+        clickable
+        @bar-click="onBarClick"
+      />
+    </section>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { RefreshCw } from 'lucide-vue-next'
+import HorizontalBarChart from '@components/charts/HorizontalBarChart.vue'
 
 export default {
   name: 'PrecipitacionView',
-  components: { RefreshCw },
+  components: { RefreshCw, HorizontalBarChart },
   computed: {
     ...mapGetters(['weatherLugares', 'weatherLoading']),
     loading() {
@@ -92,6 +72,15 @@ export default {
         })
         .sort((a, b) => b.precip - a.precip)
     },
+    barLabels() {
+      return this.filas.map((r) => r.nombre)
+    },
+    barValues() {
+      return this.filas.map((r) => r.precip)
+    },
+    barIds() {
+      return this.filas.map((r) => r.id)
+    },
     promedio() {
       if (!this.filas.length) return '—'
       return Math.round(this.filas.reduce((s, r) => s + r.precip, 0) / this.filas.length)
@@ -109,6 +98,9 @@ export default {
     ...mapActions(['fetchWeather']),
     refresh() {
       return this.fetchWeather(true)
+    },
+    onBarClick({ id }) {
+      if (id != null) this.$router.push(`/lugar/${id}`)
     },
   },
   mounted() {
@@ -142,35 +134,14 @@ export default {
   margin-top: 0.25rem;
 }
 
-.table-wrap {
+.chart-card {
   margin-top: var(--space-lg);
-  overflow-x: auto;
-  padding: 0;
 }
 
-.table-wrap .data-table {
-  margin: 0;
-}
-
-.table-wrap th,
-.table-wrap td {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.bar-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 140px;
-}
-
-.bar {
-  height: 6px;
-  max-width: 100px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  border-radius: 999px;
-  box-shadow: var(--glow-primary);
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .spin {

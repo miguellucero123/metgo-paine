@@ -3,7 +3,7 @@
     <header class="page-header">
       <h1 class="page-title">Estado del sistema</h1>
       <p class="page-subtitle">
-        Salud de datos y cliente · METGO Paine (sin API Flask Quillota)
+        Salud de datos y cliente · METGO Paine ↔ metgo-api
       </p>
       <div class="page-meta">
         <button type="button" class="btn btn-sm btn--ghost" @click="refresh">
@@ -29,7 +29,7 @@
       <ul class="info-list">
         <li><strong>Producto:</strong> METGO Paine · línea Glaciares</li>
         <li><strong>Región:</strong> Torres del Paine, Magallanes, Chile</li>
-        <li><strong>Fuente clima:</strong> Open-Meteo (cliente)</li>
+        <li><strong>Fuente clima:</strong> metgo-api (sitio=paine) → Open-Meteo → caché</li>
         <li><strong>Hermanado con:</strong> METGO Quillota (Valle de Aconcagua) — acento verde</li>
       </ul>
     </section>
@@ -85,6 +85,13 @@ export default {
             : `Datos para ${n} puntos TDP`,
         },
         {
+          titulo: 'Fuente activa',
+          icon: Database,
+          estadoLabel: this.dataSource?.startsWith('metgo-api') ? 'metgo-api' : (this.dataSource || '—'),
+          badge: this.dataSource?.startsWith('metgo-api') ? 'success' : 'neutral',
+          detalle: this.dataSource || 'Sin sync aún',
+        },
+        {
           titulo: 'Catálogo lugares',
           icon: Database,
           estadoLabel: n >= 1 ? 'Cargado' : 'Vacío',
@@ -106,6 +113,13 @@ export default {
           detalle: `Comprobado ${this.checkedAt.toLocaleTimeString('es-CL')}`,
         },
       ]
+    },
+    dataSource() {
+      try {
+        return localStorage.getItem('weather_data_source') || ''
+      } catch {
+        return ''
+      }
     },
   },
   methods: {
