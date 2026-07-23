@@ -1,9 +1,9 @@
 <template>
   <div class="detalle-view">
     <div class="container">
-      <!-- Botón volver -->
+      <!-- BotÃ³n volver -->
       <router-link to="/" class="back-button">
-        ← Volver al inicio
+        â† Volver al inicio
       </router-link>
 
       <!-- Mensaje de error si no se encuentra el lugar -->
@@ -32,7 +32,7 @@
                   type="button"
                   class="lugar-fav-btn"
                   :class="{ active: isFavoriteLugar }"
-                  :title="isFavoriteLugar ? 'Quitar de favoritos' : 'Añadir a favoritos'"
+                  :title="isFavoriteLugar ? 'Quitar de favoritos' : 'AÃ±adir a favoritos'"
                   :aria-pressed="isFavoriteLugar"
                   @click="onToggleFav"
                 >
@@ -74,29 +74,29 @@
                 <span class="coord-value text-small">{{ formattedLastUpdate }}</span>
               </div>
               <div class="coord-item">
-                <span class="coord-label">Sensación Térmica:</span>
+                <span class="coord-label">SensaciÃ³n TÃ©rmica:</span>
                 <span class="coord-value">{{ formatTemperature(sensacionTermica) }}</span>
               </div>
               <div class="coord-item">
                 <span class="coord-label">Latitud:</span>
-                <span class="coord-value">{{ lugar.coordenadas.lat }}°</span>
+                <span class="coord-value">{{ lugar.coordenadas.lat }}Â°</span>
               </div>
               <div class="coord-item">
                 <span class="coord-label">Longitud:</span>
-                <span class="coord-value">{{ lugar.coordenadas.lon }}°</span>
+                <span class="coord-value">{{ lugar.coordenadas.lon }}Â°</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Alertas meteorológicas (reglas simples — rúbrica portafolio final) -->
+        <!-- Alertas meteorolÃ³gicas (reglas simples â€” rÃºbrica portafolio final) -->
         <section
           v-if="alertasMeteorologicas.length"
           class="alertas-meteo-section glass-card"
-          aria-label="Alertas meteorológicas"
+          aria-label="Alertas meteorolÃ³gicas"
         >
           <h2 class="section-title">
-            <AlertTriangle :size="28" class="alert-icon" /> Alertas meteorológicas
+            <AlertTriangle :size="28" class="alert-icon" /> Alertas meteorolÃ³gicas
           </h2>
           <ul class="alertas-meteo-list">
             <li v-for="(texto, idx) in alertasMeteorologicas" :key="idx" role="status">
@@ -105,11 +105,11 @@
           </ul>
         </section>
 
-        <!-- Estadísticas de la semana -->
+        <!-- EstadÃ­sticas de la semana -->
         <section class="estadisticas-section">
-          <h2 class="section-title"><BarChart2 :size="28" /> Estadísticas de la Semana</h2>
+          <h2 class="section-title"><BarChart2 :size="28" /> EstadÃ­sticas de la Semana</h2>
           
-          <!-- Gráfico de Tendencia de Temperatura (SVG) -->
+          <!-- GrÃ¡fico de Tendencia de Temperatura (SVG) -->
           <div class="trend-chart-container glass-card mb-4" v-if="chartData.points.length > 0">
             <h3>Tendencia de Temperatura</h3>
             <div class="chart-wrapper">
@@ -166,20 +166,20 @@
               </svg>
             </div>
             <div class="chart-legend">
-              <span class="legend-item"><span class="dot max"></span> Máxima</span>
-              <span class="legend-item"><span class="dot min"></span> Mínima</span>
+              <span class="legend-item"><span class="dot max"></span> MÃ¡xima</span>
+              <span class="legend-item"><span class="dot min"></span> MÃ­nima</span>
             </div>
           </div>
 
           <div class="stats-grid">
             <div class="stat-box glass-card">
               <div class="stat-icon"><ThermometerSnowflake :size="32" /></div>
-              <div class="stat-label">Temperatura Mínima</div>
+              <div class="stat-label">Temperatura MÃ­nima</div>
               <div class="stat-value">{{ formatTemperature(estadisticas.tempMin) }}</div>
             </div>
             <div class="stat-box glass-card">
               <div class="stat-icon"><ThermometerSun :size="32" /></div>
-              <div class="stat-label">Temperatura Máxima</div>
+              <div class="stat-label">Temperatura MÃ¡xima</div>
               <div class="stat-value">{{ formatTemperature(estadisticas.tempMax) }}</div>
             </div>
             <div class="stat-box glass-card">
@@ -191,12 +191,12 @@
               <div class="stat-icon">
                 <WeatherIcon :icon="getWeatherIcon(estadisticas.estadoMasFrecuente)" :size="32" />
               </div>
-              <div class="stat-label">Estado más Frecuente</div>
+              <div class="stat-label">Estado mÃ¡s Frecuente</div>
               <div class="stat-value text-small">{{ estadisticas.estadoMasFrecuente }}</div>
             </div>
             <div class="stat-box glass-card" v-if="estadisticas.precipitacionPromedio">
               <div class="stat-icon"><Droplets :size="32" /></div>
-              <div class="stat-label">Precipitación Promedio</div>
+              <div class="stat-label">PrecipitaciÃ³n Promedio</div>
               <div class="stat-value">{{ estadisticas.precipitacionPromedio }}%</div>
             </div>
             <div class="stat-box glass-card" v-if="estadisticas.vientoPromedio">
@@ -212,11 +212,11 @@
           </div>
         </section>
 
-        <!-- Pronóstico semanal -->
+        <!-- PronÃ³stico semanal -->
         <section class="pronostico-section">
-          <h2 class="section-title"><Calendar :size="28" /> Pronóstico 7 Días</h2>
+          <h2 class="section-title"><Calendar :size="28" /> PronÃ³stico 7 DÃ­as</h2>
           
-          <!-- Opciones de visualización -->
+          <!-- Opciones de visualizaciÃ³n -->
           <div class="view-options">
             <button 
               :class="['view-btn', { active: vistaPronostico === 'cards' }]"
@@ -265,7 +265,7 @@
             <table class="forecast-table">
               <thead>
                 <tr>
-                  <th>Día</th>
+                  <th>DÃ­a</th>
                   <th>Estado</th>
                   <th>Temp. Min</th>
                   <th>Temp. Max</th>
@@ -297,9 +297,9 @@
           </div>
         </section>
 
-        <!-- Distribución de estados -->
+        <!-- DistribuciÃ³n de estados -->
         <section class="distribucion-section">
-          <h2 class="section-title"><BarChart2 :size="28" /> Distribución de Estados Climáticos</h2>
+          <h2 class="section-title"><BarChart2 :size="28" /> DistribuciÃ³n de Estados ClimÃ¡ticos</h2>
           <div class="distribucion-bars">
             <div 
               v-for="(cantidad, estado) in estadisticas.diasPorEstado" 
@@ -318,7 +318,7 @@
                   :class="getWeatherClass(estado)"
                   :style="{ width: `${(cantidad / 7) * 100}%` }"
                 >
-                  <span class="bar-value">{{ cantidad }} día{{ cantidad !== 1 ? 's' : '' }}</span>
+                  <span class="bar-value">{{ cantidad }} dÃ­a{{ cantidad !== 1 ? 's' : '' }}</span>
                 </div>
               </div>
             </div>
@@ -349,10 +349,10 @@
       </div>
     </div>
 
-    <!-- Modal Detalle Día -->
+    <!-- Modal Detalle DÃ­a -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-content glass-card">
-        <button class="close-btn" @click="showModal = false">×</button>
+        <button class="close-btn" @click="showModal = false">Ã—</button>
         
         <div class="modal-header" v-if="selectedDay">
           <h3>{{ selectedDay.dia }}</h3>
@@ -366,7 +366,7 @@
         </div>
 
         <div class="modal-body" v-if="selectedDayHourly">
-          <h4>Pronóstico por Horas</h4>
+          <h4>PronÃ³stico por Horas</h4>
           <div class="hourly-grid">
             <div 
               v-for="(hour, index) in selectedDayHourly" 
@@ -458,7 +458,7 @@ export default {
     resumenPronostico() {
       return generarResumenPronostico(this.estadisticas);
     },
-    /** Reglas explícitas: semana lluviosa / ola de calor (presentación fija en UI) */
+    /** Reglas explÃ­citas: semana lluviosa / ola de calor (presentaciÃ³n fija en UI) */
     alertasMeteorologicas() {
       if (!this.estadisticas || !this.lugar?.pronosticoSemanal) return [];
       const out = [];
@@ -470,34 +470,34 @@ export default {
         (d['Chubascos Fuertes'] || 0);
       if (diasLluviosos >= 4 || this.estadisticas.precipitacionPromedio >= 55) {
         out.push(
-          'Alerta: semana con alta probabilidad de precipitación. Planifica equipo impermeable y cruces de río.'
+          'Alerta: semana con alta probabilidad de precipitaciÃ³n. Planifica equipo impermeable y cruces de rÃ­o.'
         );
       }
       const diasCalurosos = this.lugar.pronosticoSemanal.filter((dia) => dia.max >= 22).length;
       if (diasCalurosos >= 3 || this.estadisticas.tempMax >= 26) {
         out.push(
-          'Alerta: varios días con temperaturas elevadas. Prioriza hidratación, sombra y protector solar.'
+          'Alerta: varios dÃ­as con temperaturas elevadas. Prioriza hidrataciÃ³n, sombra y protector solar.'
         );
       }
       if (
         this.estadisticas.vientoPromedio >= 45 &&
-        !out.some((x) => x.includes('precipitación'))
+        !out.some((x) => x.includes('precipitaciÃ³n'))
       ) {
-        out.push('Alerta: viento sostenido fuerte en el periodo. Precaución en zonas expuestas.');
+        out.push('Alerta: viento sostenido fuerte en el periodo. PrecauciÃ³n en zonas expuestas.');
       }
       return out;
     },
     sensacionTermica() {
       if (!this.lugar || !this.estadisticas) return 0;
-      // Usamos el viento promedio de la semana como aproximación si no hay dato actual de viento
-      // En un caso real, 'lugar' tendría 'vientoActual'
+      // Usamos el viento promedio de la semana como aproximaciÃ³n si no hay dato actual de viento
+      // En un caso real, 'lugar' tendrÃ­a 'vientoActual'
       const viento = this.estadisticas.vientoPromedio || 10; 
       return calculateWindChill(this.lugar.tempActual, viento);
     },
     equipoSugerido() {
       if (!this.estadisticas) return [];
       
-      const equipo = ['Mochila de trekking', 'Botella de agua (mín 1.5L)', 'Protector solar y lentes UV'];
+      const equipo = ['Mochila de trekking', 'Botella de agua (mÃ­n 1.5L)', 'Protector solar y lentes UV'];
       
       // Lluvia
       if (this.estadisticas.diasPorEstado['Lluvioso'] >= 2 || this.estadisticas.precipitacionPromedio > 30) {
@@ -507,10 +507,10 @@ export default {
         equipo.push('Polainas (Gaiters)');
       }
 
-      // Frío y Viento (Wind Chill)
+      // FrÃ­o y Viento (Wind Chill)
       if (this.estadisticas.tempMin < 5 || this.sensacionTermica < 5) {
-        equipo.push('Primera capa térmica (Mino/Sintético)');
-        equipo.push('Chaqueta de pluma o sintética (Puffy)');
+        equipo.push('Primera capa tÃ©rmica (Mino/SintÃ©tico)');
+        equipo.push('Chaqueta de pluma o sintÃ©tica (Puffy)');
         equipo.push('Gorro de abrigo y guantes');
       }
 
@@ -521,11 +521,11 @@ export default {
         equipo.push('Anclajes para carpa (si acampas)');
       }
 
-      // Terreno difícil
+      // Terreno difÃ­cil
       if (this.lugar.dificultad === 'Alta' || this.lugar.dificultad === 'Media-Alta') {
-        equipo.push('Botas de trekking con caña alta');
-        equipo.push('Linterna frontal con baterías extra');
-        equipo.push('Botiquín de primeros auxilios personal');
+        equipo.push('Botas de trekking con caÃ±a alta');
+        equipo.push('Linterna frontal con baterÃ­as extra');
+        equipo.push('BotiquÃ­n de primeros auxilios personal');
       }
       
       return equipo;
@@ -535,31 +535,31 @@ export default {
       
       const precauciones = ['Informar ruta a guardaparques (CONAF)'];
       
-      // Sensación Térmica baja
+      // SensaciÃ³n TÃ©rmica baja
       if (this.sensacionTermica < 0) {
-        precauciones.push('RIESGO DE HIPOTERMIA: Sensación térmica bajo cero.');
+        precauciones.push('RIESGO DE HIPOTERMIA: SensaciÃ³n tÃ©rmica bajo cero.');
         precauciones.push('Mantenerse seco y abrigado. Evitar paradas largas.');
       } else if (this.sensacionTermica < 5) {
-        precauciones.push('Sensación térmica baja. Usar sistema de capas.');
+        precauciones.push('SensaciÃ³n tÃ©rmica baja. Usar sistema de capas.');
       }
 
       // Viento
       if (this.estadisticas.vientoPromedio > 60) {
-        precauciones.push('PELIGRO: Ráfagas de viento extremas (>60 km/h).');
+        precauciones.push('PELIGRO: RÃ¡fagas de viento extremas (>60 km/h).');
         precauciones.push('Evitar senderos expuestos y pasos de altura.');
       } else if (this.estadisticas.vientoPromedio > 40) {
-        precauciones.push('Viento fuerte. Precaución en zonas expuestas.');
+        precauciones.push('Viento fuerte. PrecauciÃ³n en zonas expuestas.');
       }
 
       // Lluvia / Nieve
       if (this.estadisticas.precipitacionPromedio > 60) {
         precauciones.push('Riesgo de senderos embarrados y resbalosos.');
-        precauciones.push('Cruces de ríos pueden estar crecidos.');
+        precauciones.push('Cruces de rÃ­os pueden estar crecidos.');
       }
 
       // UV
       if (this.estadisticas.estadoMasFrecuente === 'Soleado') {
-        precauciones.push('Radiación UV alta. Reaplicar protector solar cada 2h.');
+        precauciones.push('RadiaciÃ³n UV alta. Reaplicar protector solar cada 2h.');
       }
       
       return precauciones;
@@ -636,9 +636,9 @@ export default {
     // Asegurar que tenemos datos actualizados
     this.fetchWeather();
 
-    // Actualizar título de la página
+    // Actualizar tÃ­tulo de la pÃ¡gina
     if (this.lugar) {
-      document.title = `${this.lugar.nombre} - ClimaTorre`;
+      document.title = `${this.lugar.nombre} - METGO Paine`;
     }
   },
   beforeUnmount() {
@@ -687,8 +687,8 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: white;
-  color: #667eea;
+  background: var(--color-surface);
+  color: var(--color-primary);
   text-decoration: none;
   border-radius: 12px;
   font-weight: 600;
@@ -704,7 +704,7 @@ export default {
 
 /* Error Message */
 .error-message {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 4rem 2rem;
   text-align: center;
@@ -718,19 +718,19 @@ export default {
 }
 
 .error-message h2 {
-  color: #333;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .error-message p {
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 2rem;
 }
 
 .btn-primary {
   display: inline-block;
   padding: 0.75rem 2rem;
-  background: #667eea;
+  background: var(--color-primary);
   color: white;
   text-decoration: none;
   border-radius: 12px;
@@ -745,7 +745,7 @@ export default {
 
 /* Header del Lugar */
 .lugar-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b1120 0%, #111827 50%, #1f2937 100%);
   border-radius: 16px;
   padding: 3rem 2rem;
   margin-bottom: 2rem;
@@ -770,7 +770,7 @@ export default {
 }
 
 .lugar-header.storm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b1120 0%, #111827 50%, #1f2937 100%);
 }
 
 .card-header.snowy {
@@ -778,7 +778,7 @@ export default {
 }
 
 .card-header.storm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b1120 0%, #111827 50%, #1f2937 100%);
 }
 
 .header-content {
@@ -911,7 +911,7 @@ export default {
 }
 
 .current-weather-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -933,13 +933,13 @@ export default {
 .weather-temp {
   font-size: 4rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
 .weather-status {
   font-size: 1.5rem;
-  color: #666;
+  color: var(--color-text-secondary);
   font-weight: 600;
 }
 
@@ -965,15 +965,15 @@ export default {
 .coord-value {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .coord-value.text-small {
   font-size: 0.85rem;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
-/* Estadísticas */
+/* EstadÃ­sticas */
 .estadisticas-section {
   margin-bottom: 2rem;
   animation: fadeIn 1s ease;
@@ -987,7 +987,7 @@ export default {
 }
 
 .stat-box {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
@@ -1007,7 +1007,7 @@ export default {
 
 .stat-label {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
@@ -1015,7 +1015,7 @@ export default {
 .stat-value {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .stat-value.text-small {
@@ -1023,7 +1023,7 @@ export default {
 }
 
 .resumen-box {
-  background: white;
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -1031,13 +1031,13 @@ export default {
 
 .resumen-text {
   font-size: 1.1rem;
-  color: #333;
+  color: var(--color-text);
   line-height: 1.6;
   text-align: center;
   margin: 0;
 }
 
-/* Pronóstico */
+/* PronÃ³stico */
 .pronostico-section {
   margin-bottom: 2rem;
   animation: fadeIn 1.2s ease;
@@ -1065,8 +1065,8 @@ export default {
 }
 
 .view-btn.active {
-  background: white;
-  color: #667eea;
+  background: var(--color-surface);
+  color: var(--color-primary);
 }
 
 .forecast-cards {
@@ -1076,7 +1076,7 @@ export default {
 }
 
 .forecast-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem 1rem;
   text-align: center;
@@ -1105,12 +1105,12 @@ export default {
 }
 
 .forecast-card.storm {
-  border-top: 4px solid #764ba2;
+  border-top: 4px solid var(--color-bg);
 }
 
 .forecast-day {
   font-weight: 700;
-  color: #333;
+  color: var(--color-text);
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
 }
@@ -1123,7 +1123,7 @@ export default {
 
 .forecast-status {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 0.75rem;
   font-weight: 500;
 }
@@ -1158,7 +1158,7 @@ export default {
 
 /* Tabla */
 .forecast-table-container {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -1168,7 +1168,7 @@ export default {
 .forecast-table {
   width: 100%;
   border-collapse: collapse;
-  color: #333;
+  color: var(--color-text);
 }
 
 .forecast-table thead {
@@ -1179,7 +1179,7 @@ export default {
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
   border-bottom: 2px solid #e0e0e0;
 }
 
@@ -1214,7 +1214,7 @@ export default {
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-surface);
   padding: 2rem;
   width: 90%;
   max-width: 600px;
@@ -1233,7 +1233,7 @@ export default {
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .modal-header {
@@ -1285,14 +1285,14 @@ export default {
 
 .hour-time {
   font-weight: 600;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 }
 
 .hour-temp {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text);
 }
 
 .hour-wind {
@@ -1384,7 +1384,7 @@ export default {
 
 .td-day {
   font-weight: 700;
-  color: #333;
+  color: var(--color-text);
 }
 
 .td-status {
@@ -1399,21 +1399,21 @@ export default {
 
 .td-temp {
   font-weight: 600;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .td-detail {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
-/* Distribución */
+/* DistribuciÃ³n */
 .distribucion-section {
   margin-bottom: 2rem;
   animation: fadeIn 1.4s ease;
 }
 
 .distribucion-bars {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -1433,7 +1433,7 @@ export default {
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .bar-icon {
@@ -1474,7 +1474,7 @@ export default {
 }
 
 .bar-fill.storm {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
 }
 
 /* Recomendaciones */
@@ -1489,7 +1489,7 @@ export default {
 }
 
 .recomendacion-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -1504,7 +1504,7 @@ export default {
 
 .recomendacion-card h3 {
   font-size: 1.25rem;
-  color: #333;
+  color: var(--color-text);
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -1519,16 +1519,16 @@ export default {
   margin-bottom: 0.5rem;
   background: #f5f7fa;
   border-radius: 8px;
-  color: #333;
+  color: var(--color-text);
   position: relative;
   padding-left: 2rem;
 }
 
 .recomendacion-card li::before {
-  content: '✓';
+  content: 'âœ“';
   position: absolute;
   left: 0.75rem;
-  color: #667eea;
+  color: var(--color-primary);
   font-weight: 700;
 }
 

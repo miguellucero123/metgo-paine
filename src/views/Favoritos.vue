@@ -107,7 +107,7 @@ export default {
 .empty {
   text-align: center;
   padding: 3rem 2rem;
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
   color: #64748b;
 }
@@ -121,7 +121,7 @@ export default {
   display: inline-block;
   margin-top: 1.25rem;
   padding: 0.65rem 1.25rem;
-  background: #667eea;
+  background: var(--color-primary);
   color: white;
   border-radius: 12px;
   text-decoration: none;

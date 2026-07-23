@@ -1,0 +1,400 @@
+<script setup>
+import { computed, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { useStore } from 'vuex'
+import {
+  LayoutDashboard,
+  Activity,
+  CloudSun,
+  CloudRain,
+  Star,
+  SlidersHorizontal,
+  LogIn,
+  UserPlus,
+  ChevronDown,
+  Home,
+  UserCog,
+} from 'lucide-vue-next'
+
+const STORAGE_KEY = 'metgo_paine_sidebar_groups_v2'
+
+const store = useStore()
+const route = useRoute()
+
+const isAuthenticated = computed(() => store.getters.isAuthenticated)
+
+const gruposDef = [
+  {
+    id: 'principal',
+    label: 'Principal',
+    icon: Home,
+    match: (path) => path === '/' || path.startsWith('/estado'),
+    items: [
+      { to: '/', label: 'Panel general', icon: LayoutDashboard, exact: true },
+      { to: '/estado', label: 'Estado sistema', icon: Activity },
+    ],
+  },
+  {
+    id: 'meteo',
+    label: 'Meteorología',
+    icon: CloudSun,
+    match: (path) => path.startsWith('/meteo') || path.startsWith('/lugar'),
+    items: [
+      { to: '/meteo', label: 'Meteorología', icon: CloudSun, exact: true },
+      { to: '/meteo/precipitacion', label: 'Precipitación', icon: CloudRain },
+    ],
+  },
+  {
+    id: 'cuenta',
+    label: 'Cuenta',
+    icon: UserCog,
+    match: (path) =>
+      path.startsWith('/favoritos') ||
+      path.startsWith('/preferencias') ||
+      path.startsWith('/login') ||
+      path.startsWith('/registro'),
+    items: [
+      { to: '/favoritos', label: 'Favoritos', icon: Star, requiresAuth: true },
+      { to: '/preferencias-clima', label: 'Preferencias', icon: SlidersHorizontal, requiresAuth: true },
+      { to: '/login', label: 'Iniciar sesión', icon: LogIn, guestOnly: true },
+      { to: '/registro', label: 'Registro', icon: UserPlus, guestOnly: true },
+    ],
+  },
+]
+
+const grupos = computed(() =>
+  gruposDef
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((link) => {
+        if (link.requiresAuth && !isAuthenticated.value) return false
+        if (link.guestOnly && isAuthenticated.value) return false
+        return true
+      }),
+    }))
+    .filter((g) => g.items.length > 0)
+)
+
+function loadOpenState() {
+  const defaults = { principal: true, meteo: true, cuenta: false }
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') return { ...defaults, ...parsed }
+    }
+  } catch {
+    /* ignore */
+  }
+  return defaults
+}
+
+const openGroups = ref(loadOpenState())
+
+function persistOpen() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(openGroups.value))
+  } catch {
+    /* ignore */
+  }
+}
+
+function toggleGroup(id) {
+  openGroups.value = {
+    ...openGroups.value,
+    [id]: !Boolean(openGroups.value[id]),
+  }
+  persistOpen()
+}
+
+function isGroupOpen(id) {
+  return Boolean(openGroups.value[id])
+}
+
+function ensureActiveGroupOpen() {
+  const path = route.path
+  let activeId = null
+  for (const g of gruposDef) {
+    if (g.match(path)) {
+      activeId = g.id
+      break
+    }
+  }
+  if (!activeId) return
+  const next = { ...openGroups.value }
+  for (const g of gruposDef) {
+    next[g.id] = g.id === activeId
+  }
+  openGroups.value = next
+  persistOpen()
+}
+
+watch(
+  () => route.path,
+  (path, prev) => {
+    if (path !== prev) ensureActiveGroupOpen()
+  },
+  { immediate: true }
+)
+
+function linkIsActive(link) {
+  const path = route.path
+  if (link.exact) return path === link.to
+  return path === link.to || path.startsWith(`${link.to}/`)
+}
+</script>
+
+<template>
+  <aside class="sidebar" aria-label="Navegación principal">
+    <div class="sidebar__brand">
+      <span class="sidebar__mark">M</span>
+      <div class="sidebar__brand-text">
+        <span class="sidebar__name">METGO</span>
+        <span class="sidebar__sub">Paine</span>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div
+        v-for="grupo in grupos"
+        :key="grupo.id"
+        class="nav-group"
+        :class="{
+          'nav-group--open': isGroupOpen(grupo.id),
+          'nav-group--active': grupo.match(route.path),
+          'nav-group--cuenta': grupo.id === 'cuenta',
+        }"
+      >
+        <button
+          type="button"
+          class="nav-group__header"
+          :aria-expanded="isGroupOpen(grupo.id)"
+          :aria-controls="`nav-group-${grupo.id}`"
+          @click.stop.prevent="toggleGroup(grupo.id)"
+        >
+          <component :is="grupo.icon" class="nav-group__icon" aria-hidden="true" />
+          <span class="nav-group__label">{{ grupo.label }}</span>
+          <ChevronDown class="nav-group__chevron" aria-hidden="true" />
+        </button>
+        <div
+          v-show="isGroupOpen(grupo.id)"
+          :id="`nav-group-${grupo.id}`"
+          class="nav-group__body"
+        >
+          <RouterLink
+            v-for="link in grupo.items"
+            :key="`${link.to}-${link.label}`"
+            :to="link.to"
+            class="nav-link nav-link--nested"
+            :class="{ active: linkIsActive(link) }"
+          >
+            <component :is="link.icon" class="nav-link__icon" aria-hidden="true" />
+            <span>{{ link.label }}</span>
+          </RouterLink>
+        </div>
+      </div>
+    </nav>
+
+    <footer class="sidebar__footer">
+      <span>Torres del Paine</span>
+      <span class="sidebar__ver">v2.1 · METGO Glaciares</span>
+    </footer>
+  </aside>
+</template>
+
+<style scoped>
+.sidebar {
+  width: 240px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__mark {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: #0b1120;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+}
+
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.sidebar__name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+.sidebar__sub {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sidebar__nav {
+  padding: 0.65rem 0.55rem;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nav-group {
+  border-radius: var(--radius-md);
+}
+
+.nav-group--cuenta {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.nav-group--active .nav-group__header {
+  color: var(--color-primary);
+}
+
+.nav-group__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background 0.12s, color 0.12s;
+  font-family: inherit;
+}
+
+.nav-group__header:hover {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.nav-group__icon {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.85;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.nav-group__label {
+  flex: 1;
+  text-align: left;
+}
+
+.nav-group__chevron {
+  width: 0.95rem;
+  height: 0.95rem;
+  opacity: 0.65;
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.nav-group--open .nav-group__chevron {
+  transform: rotate(180deg);
+}
+
+.nav-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.1rem 0 0.35rem 0.15rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.85rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: background 0.12s, color 0.12s;
+}
+
+.nav-link--nested {
+  padding-left: 1.15rem;
+  font-size: 0.84rem;
+}
+
+.nav-link__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  stroke-width: 1.75;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.nav-link:hover {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.nav-link.active {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-link.active .nav-link__icon {
+  opacity: 1;
+}
+
+.sidebar__footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sidebar__ver {
+  opacity: 0.75;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    max-height: none;
+  }
+}
+</style>

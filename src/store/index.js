@@ -32,7 +32,7 @@ function loadPersistedSession() {
 
 function guestPrefsFromStorage() {
   if (typeof localStorage === 'undefined') {
-    return { tempUnit: 'C', theme: 'light' };
+    return { tempUnit: 'C', theme: 'dark' };
   }
   const tu =
     localStorage.getItem('climatorre_guest_tempUnit') ||
@@ -42,7 +42,8 @@ function guestPrefsFromStorage() {
     localStorage.getItem('climatorre_guest_theme') || localStorage.getItem('theme');
   return {
     tempUnit: tu === 'F' ? 'F' : 'C',
-    theme: themeRaw === 'dark' ? 'dark' : 'light'
+    /* Tema Quillota: oscuro por defecto */
+    theme: themeRaw === 'light' ? 'light' : 'dark'
   };
 }
 
@@ -53,7 +54,7 @@ const initialState = persisted?.user
       user: persisted.user,
       preferences: {
         tempUnit: persisted.preferences?.tempUnit || 'C',
-        theme: persisted.preferences?.theme || 'light'
+        theme: persisted.preferences?.theme || 'dark'
       },
       favoriteIds: Array.isArray(persisted.favoriteIds)
         ? [...persisted.favoriteIds]

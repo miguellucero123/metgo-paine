@@ -1,68 +1,64 @@
 <template>
   <div class="home-view">
     <div class="container">
-      <!-- Header -->
       <header class="page-header">
-        <h1 class="page-title">
-          <WeatherIcon icon="CloudSun" :size="48" class="header-icon" /> Pronóstico Meteorológico
-          <span class="subtitle">Torres del Paine - Circuitos W y O</span>
-        </h1>
-        <p class="page-description">
-          Conoce las condiciones climáticas actuales de los principales puntos 
-          de los circuitos más emblemáticos de la Patagonia chilena
+        <h1 class="page-title">Meteorología</h1>
+        <p class="page-subtitle">
+          Condiciones actuales y pronóstico en puntos clave del parque — línea METGO Glaciares · Torres del Paine.
         </p>
-        <div class="update-info" v-if="lastUpdate">
-          <span class="update-text">
-            <RefreshCw :size="14" :class="{ 'spin': loading }" /> 
+        <div class="page-meta" v-if="lastUpdate">
+          <span class="muted">
+            <RefreshCw :size="14" :class="{ spin: loading }" />
             Última actualización: {{ formattedLastUpdate }}
           </span>
-          <button @click="fetchWeather(true)" class="btn-refresh" :disabled="loading">
-            Actualizar ahora
+          <button type="button" class="btn btn-sm btn--ghost" :disabled="loading" @click="fetchWeather(true)">
+            Actualizar
           </button>
         </div>
       </header>
 
-      <div v-if="error" class="weather-error-banner glass-card" role="alert">
-        <p>
-          No se pudieron actualizar los datos desde la API. Si hay datos en caché, se siguen mostrando.
-          Puede reintentar con «Actualizar ahora».
-        </p>
+      <div v-if="error" class="alert-banner" role="alert">
+        No se pudieron actualizar los datos desde la API. Si hay datos en caché, se siguen mostrando.
+        Puede reintentar con «Actualizar».
       </div>
 
-      <!-- Barra de búsqueda y filtros -->
-      <section class="filters-section glass-card">
+      <section class="filters-section card">
         <div class="search-bar">
           <span class="search-icon"><Search :size="20" /></span>
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Buscar lugar por nombre, circuito o descripción..."
-            class="search-input input-glass"
+            class="search-input"
           />
-          <button 
-            v-if="searchQuery" 
-            @click="searchQuery = ''"
+          <button
+            v-if="searchQuery"
+            type="button"
             class="clear-btn"
             title="Limpiar búsqueda"
+            @click="searchQuery = ''"
           >
             <X :size="16" />
           </button>
         </div>
 
         <div class="filter-buttons">
-          <button 
+          <button
+            type="button"
             :class="['filter-btn', { active: circuitoFiltro === 'Todos' }]"
             @click="circuitoFiltro = 'Todos'"
           >
             Todos
           </button>
-          <button 
+          <button
+            type="button"
             :class="['filter-btn', { active: circuitoFiltro === 'W' }]"
             @click="circuitoFiltro = 'W'"
           >
             Circuito W
           </button>
-          <button 
+          <button
+            type="button"
             :class="['filter-btn', { active: circuitoFiltro === 'O' }]"
             @click="circuitoFiltro = 'O'"
           >
@@ -81,33 +77,31 @@
         </div>
       </section>
 
-      <!-- Estadísticas generales -->
       <section class="stats-section" v-if="lugaresFiltrados.length > 0">
-        <div class="stat-card glass-card">
-          <div class="stat-icon"><MapPin :size="32" class="text-primary" /></div>
+        <div class="stat-card card">
+          <div class="stat-icon"><MapPin :size="28" class="text-primary" /></div>
           <div class="stat-value">{{ lugaresFiltrados.length }}</div>
           <div class="stat-label">Lugares</div>
         </div>
-        <div class="stat-card glass-card">
-          <div class="stat-icon"><Thermometer :size="32" class="text-warning" /></div>
+        <div class="stat-card card">
+          <div class="stat-icon"><Thermometer :size="28" class="text-warning" /></div>
           <div class="stat-value">{{ temperaturaPromedio }}°{{ tempUnit }}</div>
-          <div class="stat-label">Temp. Promedio</div>
+          <div class="stat-label">Temp. promedio</div>
         </div>
-        <div class="stat-card glass-card">
+        <div class="stat-card card">
           <div class="stat-icon">
-            <WeatherIcon :icon="estadoClimaPredominante.icono" :size="32" />
+            <WeatherIcon :icon="estadoClimaPredominante.icono" :size="28" />
           </div>
           <div class="stat-value">{{ estadoClimaPredominante.nombre }}</div>
-          <div class="stat-label">Estado Predominante</div>
+          <div class="stat-label">Estado predominante</div>
         </div>
       </section>
 
-      <!-- Mensaje cuando no hay resultados -->
-      <div v-if="lugaresFiltrados.length === 0" class="no-results glass-card">
-        <div class="no-results-icon"><Frown :size="64" /></div>
+      <div v-if="lugaresFiltrados.length === 0" class="no-results card">
+        <div class="no-results-icon"><Frown :size="48" /></div>
         <h3>No se encontraron lugares</h3>
-        <p>Intenta con otro término de búsqueda o filtro</p>
-        <button @click="resetFilters" class="reset-btn btn-primary">
+        <p class="muted">Intenta con otro término de búsqueda o filtro</p>
+        <button type="button" class="btn" @click="resetFilters">
           Restablecer filtros
         </button>
       </div>
@@ -259,137 +253,69 @@ export default {
 
 <style scoped>
 .home-view {
-  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  width: 100%;
 }
 
-.weather-error-banner {
-  margin-bottom: 1.25rem;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid #e11d48;
-  background: rgba(225, 29, 72, 0.08);
-}
-
-.weather-error-banner p {
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* Header */
-.page-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  animation: fadeInDown 0.6s ease;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.subtitle {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 400;
-  margin-top: 0.5rem;
-  opacity: 0.9;
-}
-
-.page-description {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.95);
-  max-width: 700px;
-  margin: 0 auto 1.5rem;
-  line-height: 1.6;
-}
-
-.update-info {
+.page-meta {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  gap: 0.75rem;
+  margin-top: 0.75rem;
 }
 
-.update-text {
-  display: flex;
+.page-meta .muted {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-.btn-refresh {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-refresh:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.btn-refresh:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Filters Section */
 .filters-section {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.6s ease;
+  margin-bottom: var(--space-lg);
 }
 
 .search-bar {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .search-icon {
   position: absolute;
-  left: 1rem;
+  left: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.25rem;
-  color: var(--text-secondary);
+  color: var(--color-muted);
+  display: flex;
 }
 
 .search-input {
   width: 100%;
-  padding: 1rem 3rem 1rem 3.5rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  padding: 0.75rem 2.75rem 0.75rem 2.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
 }
 
 .clear-btn {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  background: #f0f0f0;
+  background: var(--color-surface-elevated);
   border: none;
   border-radius: 50%;
   width: 28px;
@@ -398,159 +324,140 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  color: var(--color-muted);
 }
 
 .clear-btn:hover {
-  background: #e0e0e0;
-  transform: translateY(-50%) scale(1.1);
+  color: var(--color-primary);
 }
 
 .filter-buttons {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
 
 .filter-btn {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #e0e0e0;
-  background: white;
-  border-radius: 12px;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
 }
 
 .filter-btn.active {
-  background: #667eea;
-  color: white;
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .sort-controls {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .sort-label {
   font-weight: 600;
-  color: #333;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .sort-select {
   flex: 1;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  font-size: 0.95rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--color-bg);
+  color: var(--color-text);
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .sort-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
-/* Stats Section */
 .stats-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  animation: fadeIn 0.8s ease;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .stat-card {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  transition: border-color 0.15s, transform 0.15s;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
 }
 
 .stat-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary);
+  margin-bottom: 0.35rem;
+  display: flex;
+  justify-content: center;
+  color: var(--color-primary);
 }
 
 .stat-value {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #667eea;
-  margin-bottom: 0.25rem;
+  color: var(--color-text);
+  margin-bottom: 0.15rem;
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.75rem;
+  color: var(--color-muted);
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* No Results */
 .no-results {
-  background: white;
-  border-radius: 16px;
-  padding: 4rem 2rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 3rem 1.5rem;
 }
 
 .no-results-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-muted);
+  display: flex;
+  justify-content: center;
 }
 
 .no-results h3 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+  margin-bottom: 0.35rem;
+  color: var(--color-text);
 }
 
-.no-results p {
-  color: #666;
-  margin-bottom: 1.5rem;
+.no-results .muted {
+  margin-bottom: 1.25rem;
 }
 
-.reset-btn {
-  padding: 0.75rem 2rem;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.reset-btn:hover {
-  background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-/* Places Grid */
 .places-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-  animation: fadeIn 1s ease;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-md);
   transition: opacity 0.3s;
 }
 
@@ -564,19 +471,18 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
-  margin-top: 2rem;
-  color: white;
+  padding: 3rem;
+  color: var(--color-muted);
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: white;
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-border);
+  border-left-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 @keyframes spin {
@@ -587,51 +493,7 @@ export default {
   animation: spin 1s linear infinite;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-  .container {
-    padding: 0 1rem;
-  }
-
-  .page-title {
-    font-size: 2rem;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-  }
-
-  .page-description {
-    font-size: 1rem;
-  }
-
-  .filters-section {
-    padding: 1rem;
-  }
-
   .sort-controls {
     flex-direction: column;
     align-items: stretch;

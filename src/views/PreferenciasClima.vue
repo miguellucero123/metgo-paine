@@ -157,9 +157,9 @@ export default {
 }
 
 .unit-btn.active {
-  background: #667eea;
+  background: var(--color-primary);
   color: white;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 2px 8px rgba(26, 107, 122, 0.35);
 }
 
 .theme-row {
@@ -175,7 +175,7 @@ export default {
   padding: 0.75rem 1.25rem;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
-  background: white;
+  background: var(--color-surface);
   cursor: pointer;
   font-weight: 600;
   color: #334155;
@@ -183,7 +183,7 @@ export default {
 }
 
 .theme-choice.active {
-  border-color: #667eea;
+  border-color: var(--color-primary);
   background: #eef2ff;
   color: #4338ca;
 }

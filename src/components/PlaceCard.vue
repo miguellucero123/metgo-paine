@@ -172,123 +172,123 @@ export default {
 
 .place-fav-btn {
   position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  z-index: 3;
-  width: 42px;
-  height: 42px;
-  border: none;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-border);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  color: #94a3b8;
+  background: var(--color-surface);
+  color: var(--color-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
 .place-fav-btn:hover {
-  transform: scale(1.08);
-  color: #f43f5e;
+  color: var(--color-danger);
+  border-color: var(--color-border-strong);
 }
 
 .place-fav-btn.active {
-  color: #e11d48;
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
 
 .place-card {
   display: block;
-  background: white;
-  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
   text-decoration: none;
   color: inherit;
+  height: 100%;
 }
 
 .place-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--glow-primary);
 }
 
 .card-header {
   position: relative;
-  padding: 2rem 1.5rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.25rem 1.25rem 0.85rem;
+  background: linear-gradient(135deg, #0b1120 0%, #111827 55%, #1f2937 100%);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
 .card-header.sunny {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #0b1120 0%, rgba(245, 158, 11, 0.25) 100%);
 }
 
 .card-header.cloudy {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #0b1120 0%, rgba(14, 165, 233, 0.25) 100%);
 }
 
 .card-header.rainy {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, #0b1120 0%, rgba(16, 185, 129, 0.25) 100%);
 }
 
 .card-header.snowy {
-  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  background: linear-gradient(135deg, #0b1120 0%, rgba(56, 189, 248, 0.28) 100%);
 }
 
 .card-header.storm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0b1120 0%, rgba(34, 211, 238, 0.18) 100%);
 }
 
 .place-icon {
-  font-size: 3rem;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
-  color: white;
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.35));
 }
 
 .weather-badge {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.weather-icon {
-  font-size: 1.25rem;
+  gap: 0.4rem;
 }
 
 .weather-text {
   font-weight: 600;
-  font-size: 0.875rem;
-  color: #333;
+  font-size: 0.75rem;
+  color: var(--color-text);
 }
 
 .weather-icon.text-snow {
-  color: #4facfe;
+  color: var(--color-accent-light);
 }
 
 .card-body {
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .place-name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
 }
 
 .place-description {
-  font-size: 0.875rem;
-  color: #666;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
   line-height: 1.5;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -298,85 +298,77 @@ export default {
 .place-info {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 0.4rem;
+  font-size: 0.8rem;
 }
 
 .info-icon {
-  font-size: 1rem;
-  color: var(--primary);
+  color: var(--color-primary);
+  display: flex;
 }
 
 .info-label {
-  color: #666;
+  color: var(--color-muted);
   font-weight: 500;
 }
 
 .info-value {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
-.circuit-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+.circuit-badge,
+.difficulty-badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 .circuit-W {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--color-info-bg);
+  color: var(--color-accent-light);
 }
 
 .circuit-O {
-  background: #fff3e0;
-  color: #f57c00;
-}
-
-.difficulty-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .difficulty-success {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .difficulty-info {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--color-info-bg);
+  color: var(--color-accent-light);
 }
 
-.difficulty-warning {
-  background: #fff3e0;
-  color: #f57c00;
-}
-
+.difficulty-warning,
 .difficulty-orange {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .difficulty-danger {
-  background: #ffebee;
-  color: #c62828;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 .temperature-display {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-  border-radius: 12px;
-  padding: 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -385,80 +377,66 @@ export default {
 .temp-current {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .temp-label {
-  font-size: 0.75rem;
-  color: #666;
+  font-size: 0.65rem;
+  color: var(--color-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
 }
 
 .temp-value {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .temp-range {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 0.4rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
 .temp-min {
-  color: #4facfe;
+  color: var(--color-accent-light);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 
 .temp-max {
-  color: #f5576c;
+  color: var(--color-warning);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-}
-
-.temp-icon {
-  font-size: 1rem;
+  gap: 0.2rem;
 }
 
 .temp-separator {
-  color: #999;
+  color: var(--color-muted);
 }
 
 .card-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: center;
+  background: var(--color-primary-subtle);
 }
 
 .view-details {
   font-weight: 600;
-  color: #667eea;
-  font-size: 0.875rem;
-  transition: transform 0.2s ease;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  transition: transform 0.15s ease;
   display: inline-block;
 }
 
 .place-card:hover .view-details {
-  transform: translateX(5px);
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .place-name {
-    font-size: 1.25rem;
-  }
-
-  .temp-value {
-    font-size: 1.5rem;
-  }
+  transform: translateX(4px);
 }
 </style>

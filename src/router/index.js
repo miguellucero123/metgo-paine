@@ -1,109 +1,108 @@
 /**
- * Vue Router + rutas protegidas (Módulo 7)
+ * Vue Router — METGO Paine (shell tipo Quillota)
  */
 
-import { createRouter, createWebHistory } from 'vue-router';
-import store from '@store/index.js';
-import Home from '@views/Home.vue';
-import LugarDetalle from '@views/LugarDetalle.vue';
-import Login from '@views/Login.vue';
-import Registro from '@views/Registro.vue';
-import Favoritos from '@views/Favoritos.vue';
-import PreferenciasClima from '@views/PreferenciasClima.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import store from '@store/index.js'
+import DashboardView from '@views/DashboardView.vue'
+import Home from '@views/Home.vue'
+import EstadoView from '@views/EstadoView.vue'
+import PrecipitacionView from '@views/PrecipitacionView.vue'
+import LugarDetalle from '@views/LugarDetalle.vue'
+import Login from '@views/Login.vue'
+import Registro from '@views/Registro.vue'
+import Favoritos from '@views/Favoritos.vue'
+import PreferenciasClima from '@views/PreferenciasClima.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'Dashboard',
+    component: DashboardView,
+    meta: { title: 'Panel general — METGO Paine' },
+  },
+  {
+    path: '/estado',
+    name: 'Estado',
+    component: EstadoView,
+    meta: { title: 'Estado sistema — METGO Paine' },
+  },
+  {
+    path: '/meteo',
+    name: 'Meteo',
     component: Home,
-    meta: {
-      title: 'ClimaTorre - Inicio'
-    }
+    meta: { title: 'Meteorología — METGO Paine' },
+  },
+  {
+    path: '/meteo/precipitacion',
+    name: 'Precipitacion',
+    component: PrecipitacionView,
+    meta: { title: 'Precipitación — METGO Paine' },
   },
   {
     path: '/login',
     name: 'Login',
     component: Login,
-    meta: {
-      title: 'Iniciar sesión',
-      guestOnly: true
-    }
+    meta: { title: 'Iniciar sesión', guestOnly: true },
   },
   {
     path: '/registro',
     name: 'Registro',
     component: Registro,
-    meta: {
-      title: 'Registro',
-      guestOnly: true
-    }
+    meta: { title: 'Registro', guestOnly: true },
   },
   {
     path: '/favoritos',
     name: 'Favoritos',
     component: Favoritos,
-    meta: {
-      title: 'Mis favoritos',
-      requiresAuth: true
-    }
+    meta: { title: 'Mis favoritos', requiresAuth: true },
   },
   {
     path: '/preferencias-clima',
     name: 'PreferenciasClima',
     component: PreferenciasClima,
-    meta: {
-      title: 'Mis preferencias de clima',
-      requiresAuth: true
-    }
+    meta: { title: 'Preferencias de clima', requiresAuth: true },
   },
   {
     path: '/lugar/:id',
     name: 'LugarDetalle',
     component: LugarDetalle,
     props: true,
-    meta: {
-      title: 'Detalle del Lugar'
-    }
+    meta: { title: 'Detalle del lugar — METGO Paine' },
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
-  }
-];
+    redirect: '/',
+  },
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    }
-    return { top: 0 };
-  }
-});
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
+})
 
 router.beforeEach((to, from, next) => {
   if (!['/login', '/registro'].includes(to.path)) {
-    sessionStorage.setItem('lastRoute', to.fullPath);
+    sessionStorage.setItem('lastRoute', to.fullPath)
   }
 
-  document.title = to.meta.title || 'ClimaTorre - Torres del Paine';
+  document.title = to.meta.title || 'METGO Paine — Torres del Paine'
 
   if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
-    // Tras el login, la vista Login valida `redirect` con sanitizeRedirectPath (solo rutas internas).
-    next({
-      name: 'Login',
-      query: { redirect: to.fullPath }
-    });
-    return;
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+    return
   }
 
   if (to.meta.guestOnly && store.getters.isAuthenticated) {
-    next('/');
-    return;
+    next('/')
+    return
   }
 
-  next();
-});
+  next()
+})
 
-export default router;
+export default router

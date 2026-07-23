@@ -1,7 +1,7 @@
 {
-  "name": "climatore-vue-spa",
-  "version": "2.0.0",
-  "description": "ClimaTorre - Torres del Paine Weather App | SPA Vue 3 + Vuex (Módulo 7)",
+  "name": "metgo-paine",
+  "version": "2.1.0",
+  "description": "METGO Paine — clima y criósfera en Torres del Paine | Vue 3 + Vuex + Vite",
   "main": "src/main.js",
   "type": "module",
   "scripts": {
@@ -12,14 +12,14 @@
     "watch-css": "sass --watch scss/main.scss css/main.css"
   },
   "keywords": [
+    "metgo",
+    "glaciares",
+    "torres-del-paine",
     "weather",
     "vue",
-    "vue-router",
-    "vuex",
-    "spa",
-    "torres-del-paine"
+    "cryosphere"
   ],
-  "author": "",
+  "author": "METGO 3D SpA",
   "license": "ISC",
   "dependencies": {
     "lucide-vue-next": "^0.574.0",
