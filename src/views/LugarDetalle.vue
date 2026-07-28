@@ -1,7 +1,7 @@
 <template>
   <div class="detalle-view">
     <div class="container">
-      <!-- BotÃ³n volver -->
+      <!-- Botón volver -->
       <router-link to="/meteo" class="back-button">
         â† Volver al inicio
       </router-link>
@@ -32,7 +32,7 @@
                   type="button"
                   class="lugar-fav-btn"
                   :class="{ active: isFavoriteLugar }"
-                  :title="isFavoriteLugar ? 'Quitar de favoritos' : 'AÃ±adir a favoritos'"
+                  :title="isFavoriteLugar ? 'Quitar de favoritos' : 'Añadir a favoritos'"
                   :aria-pressed="isFavoriteLugar"
                   @click="onToggleFav"
                 >
@@ -74,29 +74,29 @@
                 <span class="coord-value text-small">{{ formattedLastUpdate }}</span>
               </div>
               <div class="coord-item">
-                <span class="coord-label">SensaciÃ³n TÃ©rmica:</span>
+                <span class="coord-label">Sensación Térmica:</span>
                 <span class="coord-value">{{ formatTemperature(sensacionTermica) }}</span>
               </div>
               <div class="coord-item">
                 <span class="coord-label">Latitud:</span>
-                <span class="coord-value">{{ lugar.coordenadas.lat }}Â°</span>
+                <span class="coord-value">{{ lugar.coordenadas.lat }}°</span>
               </div>
               <div class="coord-item">
                 <span class="coord-label">Longitud:</span>
-                <span class="coord-value">{{ lugar.coordenadas.lon }}Â°</span>
+                <span class="coord-value">{{ lugar.coordenadas.lon }}°</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Alertas meteorolÃ³gicas (reglas simples â€” rÃºbrica portafolio final) -->
+        <!-- Alertas meteorológicas (reglas simples — rúbrica portafolio final) -->
         <section
           v-if="alertasMeteorologicas.length"
           class="alertas-meteo-section glass-card"
-          aria-label="Alertas meteorolÃ³gicas"
+          aria-label="Alertas meteorológicas"
         >
           <h2 class="section-title">
-            <AlertTriangle :size="28" class="alert-icon" /> Alertas meteorolÃ³gicas
+            <AlertTriangle :size="28" class="alert-icon" /> Alertas meteorológicas
           </h2>
           <ul class="alertas-meteo-list">
             <li v-for="(texto, idx) in alertasMeteorologicas" :key="idx" role="status">
@@ -105,9 +105,9 @@
           </ul>
         </section>
 
-        <!-- EstadÃ­sticas de la semana -->
+        <!-- Estadísticas de la semana -->
         <section class="estadisticas-section">
-          <h2 class="section-title"><BarChart2 :size="28" /> EstadÃ­sticas de la Semana</h2>
+          <h2 class="section-title"><BarChart2 :size="28" /> Estadísticas de la Semana</h2>
           
           <div class="trend-chart-container card mb-4" v-if="serieLabels.length">
             <h3>Tendencia de temperatura</h3>
@@ -127,12 +127,12 @@
           <div class="stats-grid">
             <div class="stat-box glass-card">
               <div class="stat-icon"><ThermometerSnowflake :size="32" /></div>
-              <div class="stat-label">Temperatura MÃ­nima</div>
+              <div class="stat-label">Temperatura Mínima</div>
               <div class="stat-value">{{ formatTemperature(estadisticas.tempMin) }}</div>
             </div>
             <div class="stat-box glass-card">
               <div class="stat-icon"><ThermometerSun :size="32" /></div>
-              <div class="stat-label">Temperatura MÃ¡xima</div>
+              <div class="stat-label">Temperatura Máxima</div>
               <div class="stat-value">{{ formatTemperature(estadisticas.tempMax) }}</div>
             </div>
             <div class="stat-box glass-card">
@@ -144,12 +144,12 @@
               <div class="stat-icon">
                 <WeatherIcon :icon="getWeatherIcon(estadisticas.estadoMasFrecuente)" :size="32" />
               </div>
-              <div class="stat-label">Estado mÃ¡s Frecuente</div>
+              <div class="stat-label">Estado más Frecuente</div>
               <div class="stat-value text-small">{{ estadisticas.estadoMasFrecuente }}</div>
             </div>
             <div class="stat-box glass-card" v-if="estadisticas.precipitacionPromedio">
               <div class="stat-icon"><Droplets :size="32" /></div>
-              <div class="stat-label">PrecipitaciÃ³n Promedio</div>
+              <div class="stat-label">Precipitación Promedio</div>
               <div class="stat-value">{{ estadisticas.precipitacionPromedio }}%</div>
             </div>
             <div class="stat-box glass-card" v-if="estadisticas.vientoPromedio">
@@ -165,11 +165,11 @@
           </div>
         </section>
 
-        <!-- PronÃ³stico semanal -->
+        <!-- Pronóstico semanal -->
         <section class="pronostico-section">
-          <h2 class="section-title"><Calendar :size="28" /> PronÃ³stico 7 DÃ­as</h2>
+          <h2 class="section-title"><Calendar :size="28" /> Pronóstico 7 Días</h2>
           
-          <!-- Opciones de visualizaciÃ³n -->
+          <!-- Opciones de visualización -->
           <div class="view-options">
             <button 
               :class="['view-btn', { active: vistaPronostico === 'cards' }]"
@@ -218,7 +218,7 @@
             <table class="forecast-table">
               <thead>
                 <tr>
-                  <th>DÃ­a</th>
+                  <th>Día</th>
                   <th>Estado</th>
                   <th>Temp. Min</th>
                   <th>Temp. Max</th>
@@ -250,9 +250,9 @@
           </div>
         </section>
 
-        <!-- DistribuciÃ³n de estados -->
+        <!-- Distribución de estados -->
         <section class="distribucion-section">
-          <h2 class="section-title"><BarChart2 :size="28" /> DistribuciÃ³n de Estados ClimÃ¡ticos</h2>
+          <h2 class="section-title"><BarChart2 :size="28" /> Distribución de Estados Climáticos</h2>
           <div class="distribucion-bars">
             <div 
               v-for="(cantidad, estado) in estadisticas.diasPorEstado" 
@@ -271,7 +271,7 @@
                   :class="getWeatherClass(estado)"
                   :style="{ width: `${(cantidad / 7) * 100}%` }"
                 >
-                  <span class="bar-value">{{ cantidad }} dÃ­a{{ cantidad !== 1 ? 's' : '' }}</span>
+                  <span class="bar-value">{{ cantidad }} día{{ cantidad !== 1 ? 's' : '' }}</span>
                 </div>
               </div>
             </div>
@@ -302,10 +302,10 @@
       </div>
     </div>
 
-    <!-- Modal Detalle DÃ­a -->
+    <!-- Modal Detalle Día -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-content glass-card">
-        <button class="close-btn" @click="showModal = false">Ã—</button>
+        <button class="close-btn" @click="showModal = false" aria-label="Cerrar">&times;</button>
         
         <div class="modal-header" v-if="selectedDay">
           <h3>{{ selectedDay.dia }}</h3>
@@ -319,7 +319,7 @@
         </div>
 
         <div class="modal-body" v-if="selectedDayHourly">
-          <h4>PronÃ³stico por Horas</h4>
+          <h4>Pronóstico por Horas</h4>
           <div class="hourly-grid">
             <div 
               v-for="(hour, index) in selectedDayHourly" 
@@ -411,7 +411,7 @@ export default {
     resumenPronostico() {
       return generarResumenPronostico(this.estadisticas);
     },
-    /** Reglas explÃ­citas: semana lluviosa / ola de calor (presentaciÃ³n fija en UI) */
+    /** Reglas explícitas: semana lluviosa / ola de calor (presentación fija en UI) */
     alertasMeteorologicas() {
       if (!this.estadisticas || !this.lugar?.pronosticoSemanal) return [];
       const out = [];
@@ -423,34 +423,34 @@ export default {
         (d['Chubascos Fuertes'] || 0);
       if (diasLluviosos >= 4 || this.estadisticas.precipitacionPromedio >= 55) {
         out.push(
-          'Alerta: semana con alta probabilidad de precipitaciÃ³n. Planifica equipo impermeable y cruces de rÃ­o.'
+          'Alerta: semana con alta probabilidad de precipitación. Planifica equipo impermeable y cruces de río.'
         );
       }
       const diasCalurosos = this.lugar.pronosticoSemanal.filter((dia) => dia.max >= 22).length;
       if (diasCalurosos >= 3 || this.estadisticas.tempMax >= 26) {
         out.push(
-          'Alerta: varios dÃ­as con temperaturas elevadas. Prioriza hidrataciÃ³n, sombra y protector solar.'
+          'Alerta: varios días con temperaturas elevadas. Prioriza hidratación, sombra y protector solar.'
         );
       }
       if (
         this.estadisticas.vientoPromedio >= 45 &&
-        !out.some((x) => x.includes('precipitaciÃ³n'))
+        !out.some((x) => x.includes('precipitación'))
       ) {
-        out.push('Alerta: viento sostenido fuerte en el periodo. PrecauciÃ³n en zonas expuestas.');
+        out.push('Alerta: viento sostenido fuerte en el periodo. Precaución en zonas expuestas.');
       }
       return out;
     },
     sensacionTermica() {
       if (!this.lugar || !this.estadisticas) return 0;
-      // Usamos el viento promedio de la semana como aproximaciÃ³n si no hay dato actual de viento
-      // En un caso real, 'lugar' tendrÃ­a 'vientoActual'
+      // Usamos el viento promedio de la semana como aproximación si no hay dato actual de viento
+      // En un caso real, 'lugar' tendría 'vientoActual'
       const viento = this.estadisticas.vientoPromedio || 10; 
       return calculateWindChill(this.lugar.tempActual, viento);
     },
     equipoSugerido() {
       if (!this.estadisticas) return [];
       
-      const equipo = ['Mochila de trekking', 'Botella de agua (mÃ­n 1.5L)', 'Protector solar y lentes UV'];
+      const equipo = ['Mochila de trekking', 'Botella de agua (mín 1.5L)', 'Protector solar y lentes UV'];
       
       // Lluvia
       if (this.estadisticas.diasPorEstado['Lluvioso'] >= 2 || this.estadisticas.precipitacionPromedio > 30) {
@@ -460,10 +460,10 @@ export default {
         equipo.push('Polainas (Gaiters)');
       }
 
-      // FrÃ­o y Viento (Wind Chill)
+      // Frío y Viento (Wind Chill)
       if (this.estadisticas.tempMin < 5 || this.sensacionTermica < 5) {
-        equipo.push('Primera capa tÃ©rmica (Mino/SintÃ©tico)');
-        equipo.push('Chaqueta de pluma o sintÃ©tica (Puffy)');
+        equipo.push('Primera capa térmica (Mino/Sintético)');
+        equipo.push('Chaqueta de pluma o sintética (Puffy)');
         equipo.push('Gorro de abrigo y guantes');
       }
 
@@ -474,11 +474,11 @@ export default {
         equipo.push('Anclajes para carpa (si acampas)');
       }
 
-      // Terreno difÃ­cil
+      // Terreno difícil
       if (this.lugar.dificultad === 'Alta' || this.lugar.dificultad === 'Media-Alta') {
-        equipo.push('Botas de trekking con caÃ±a alta');
-        equipo.push('Linterna frontal con baterÃ­as extra');
-        equipo.push('BotiquÃ­n de primeros auxilios personal');
+        equipo.push('Botas de trekking con caña alta');
+        equipo.push('Linterna frontal con baterías extra');
+        equipo.push('Botiquín de primeros auxilios personal');
       }
       
       return equipo;
@@ -488,31 +488,31 @@ export default {
       
       const precauciones = ['Informar ruta a guardaparques (CONAF)'];
       
-      // SensaciÃ³n TÃ©rmica baja
+      // Sensación Térmica baja
       if (this.sensacionTermica < 0) {
-        precauciones.push('RIESGO DE HIPOTERMIA: SensaciÃ³n tÃ©rmica bajo cero.');
+        precauciones.push('RIESGO DE HIPOTERMIA: Sensación térmica bajo cero.');
         precauciones.push('Mantenerse seco y abrigado. Evitar paradas largas.');
       } else if (this.sensacionTermica < 5) {
-        precauciones.push('SensaciÃ³n tÃ©rmica baja. Usar sistema de capas.');
+        precauciones.push('Sensación térmica baja. Usar sistema de capas.');
       }
 
       // Viento
       if (this.estadisticas.vientoPromedio > 60) {
-        precauciones.push('PELIGRO: RÃ¡fagas de viento extremas (>60 km/h).');
+        precauciones.push('PELIGRO: Ráfagas de viento extremas (>60 km/h).');
         precauciones.push('Evitar senderos expuestos y pasos de altura.');
       } else if (this.estadisticas.vientoPromedio > 40) {
-        precauciones.push('Viento fuerte. PrecauciÃ³n en zonas expuestas.');
+        precauciones.push('Viento fuerte. Precaución en zonas expuestas.');
       }
 
       // Lluvia / Nieve
       if (this.estadisticas.precipitacionPromedio > 60) {
         precauciones.push('Riesgo de senderos embarrados y resbalosos.');
-        precauciones.push('Cruces de rÃ­os pueden estar crecidos.');
+        precauciones.push('Cruces de ríos pueden estar crecidos.');
       }
 
       // UV
       if (this.estadisticas.estadoMasFrecuente === 'Soleado') {
-        precauciones.push('RadiaciÃ³n UV alta. Reaplicar protector solar cada 2h.');
+        precauciones.push('Radiación UV alta. Reaplicar protector solar cada 2h.');
       }
       
       return precauciones;
@@ -575,7 +575,7 @@ export default {
     // Asegurar que tenemos datos actualizados
     this.fetchWeather();
 
-    // Actualizar tÃ­tulo de la pÃ¡gina
+    // Actualizar título de la página
     if (this.lugar) {
       document.title = `${this.lugar.nombre} - METGO Paine`;
     }
@@ -912,7 +912,7 @@ export default {
   color: var(--color-primary);
 }
 
-/* EstadÃ­sticas */
+/* Estadísticas */
 .estadisticas-section {
   margin-bottom: 2rem;
   animation: fadeIn 1s ease;
@@ -976,7 +976,7 @@ export default {
   margin: 0;
 }
 
-/* PronÃ³stico */
+/* Pronóstico */
 .pronostico-section {
   margin-bottom: 2rem;
   animation: fadeIn 1.2s ease;
@@ -1345,7 +1345,7 @@ export default {
   color: var(--color-text-secondary);
 }
 
-/* DistribuciÃ³n */
+/* Distribución */
 .distribucion-section {
   margin-bottom: 2rem;
   animation: fadeIn 1.4s ease;
