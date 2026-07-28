@@ -137,3 +137,20 @@
   color: var(--color-muted);
   text-align: center;
 }
+
+.login-hint {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.login-hint.muted,
+.muted {
+  color: var(--color-muted);
+}
+
+.auth-form {
+  margin-top: 0.25rem;
+}
+

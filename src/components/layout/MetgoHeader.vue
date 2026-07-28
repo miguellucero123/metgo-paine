@@ -2,10 +2,12 @@
 import { computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { MapPin, LogOut, Settings, Sun, Moon, Activity } from 'lucide-vue-next'
+import { MapPin, LogOut, Settings, Activity, Menu } from 'lucide-vue-next'
 import siteConfig from '@/site.config.js'
 
 const site = inject('site', siteConfig)
+const navOpen = inject('navOpen', null)
+const toggleNav = inject('toggleNav', () => {})
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -13,17 +15,10 @@ const route = useRoute()
 const user = computed(() => store.state.user)
 const preferences = computed(() => store.state.preferences)
 const isAuthenticated = computed(() => store.getters.isAuthenticated)
-const isDarkMode = computed(() => preferences.value.theme === 'dark')
-const online = computed(() => typeof navigator !== 'undefined' ? navigator.onLine : true)
+const online = computed(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
 
 function setTempUnit(tempUnit) {
   store.dispatch('updatePreferences', { tempUnit })
-}
-
-function toggleTheme() {
-  store.dispatch('updatePreferences', {
-    theme: isDarkMode.value ? 'light' : 'dark',
-  })
 }
 
 function logout() {
@@ -37,6 +32,20 @@ function logout() {
 <template>
   <header class="header">
     <div class="header__left">
+      <button
+        type="button"
+        class="nav-toggle"
+        :aria-expanded="navOpen ? 'true' : 'false'"
+        aria-controls="metgo-sidebar"
+        aria-label="Abrir o cerrar menú"
+        @click="toggleNav"
+      >
+        <Menu aria-hidden="true" />
+      </button>
+      <div class="header__brand">
+        <span class="header__brand-mark">{{ site.productName }}</span>
+        <span class="header__brand-site">{{ site.siteLabel }}</span>
+      </div>
       <div class="header__title-block">
         <h1 class="header__title">{{ site.copy?.headerTitle || 'Sistema de monitoreo' }}</h1>
         <p class="header__subtitle">
@@ -53,7 +62,7 @@ function logout() {
       </div>
 
       <div v-if="isAuthenticated && user" class="user-chip">
-        {{ user.nombre || user.email }}
+        {{ user.nombre || user.username || user.email }}
       </div>
 
       <div class="temp-unit-selector" role="group" aria-label="Unidad de temperatura">
@@ -72,16 +81,6 @@ function logout() {
           °F
         </button>
       </div>
-
-      <button
-        type="button"
-        class="header-icon-btn"
-        :title="isDarkMode ? 'Modo claro' : 'Modo oscuro'"
-        @click="toggleTheme"
-      >
-        <Sun v-if="isDarkMode" aria-hidden="true" />
-        <Moon v-else aria-hidden="true" />
-      </button>
 
       <router-link
         v-if="isAuthenticated"
@@ -119,6 +118,73 @@ function logout() {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.nav-toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+}
+
+.header__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.header__brand-mark {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+}
+
+.header__brand-site {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.header__title-block {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .header__title-block {
+    display: none;
+  }
 }
 
 .header__title {
@@ -214,7 +280,6 @@ function logout() {
   box-shadow: var(--glow-primary);
 }
 
-.header-icon-btn,
 .header-link {
   display: inline-flex;
   align-items: center;
@@ -228,13 +293,11 @@ function logout() {
   text-decoration: none;
 }
 
-.header-icon-btn svg,
 .header-link svg {
   width: 1rem;
   height: 1rem;
 }
 
-.header-icon-btn:hover,
 .header-link:hover {
   background: var(--color-primary-muted);
   color: var(--color-primary);

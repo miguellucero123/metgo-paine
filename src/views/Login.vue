@@ -8,9 +8,12 @@
         <h1>METGO</h1>
         <p class="auth-tagline">Clima y criósfera</p>
         <p class="auth-region">Torres del Paine · Circuitos W y O</p>
+        <p class="login-hint muted">
+          Demo: <strong>paine</strong>/paine123 · JWT sitio <code>paine</code>
+        </p>
       </div>
 
-      <form @submit.prevent="onSubmit">
+      <form class="auth-form" @submit.prevent="onSubmit">
         <label class="field">
           <span>Usuario</span>
           <input
@@ -45,7 +48,7 @@
         ¿No tienes cuenta?
         <router-link to="/registro">Regístrate</router-link>
       </p>
-      <p class="hint">JWT · sitio <code>paine</code> · demo <code>paine</code> / <code>paine123</code></p>
+      <p class="hint">Misma experiencia de acceso que Quillota · metgo-api</p>
     </div>
   </div>
 </template>
@@ -76,7 +79,12 @@ export default {
       this.error = ''
       this.loading = true
       try {
-        await wakeApi()
+        try {
+          await wakeApi()
+        } catch (e) {
+          this.error = e?.message || 'No se pudo contactar la API. Reintente en un minuto.'
+          return
+        }
         await this.login({
           username: this.username,
           password: this.password,

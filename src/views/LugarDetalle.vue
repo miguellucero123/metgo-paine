@@ -862,7 +862,7 @@ export default {
 
 .weather-icon-large {
   font-size: 5rem;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
 .weather-info {
@@ -941,7 +941,7 @@ export default {
 .stat-icon {
   font-size: 2.5rem;
   margin-bottom: 0.75rem;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
 .stat-label {
@@ -1057,7 +1057,7 @@ export default {
 .forecast-icon {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
 .forecast-status {
@@ -1111,7 +1111,7 @@ export default {
 }
 
 .forecast-table thead {
-  background: #f5f7fa;
+  background: var(--color-bg);
 }
 
 .forecast-table th {
@@ -1185,7 +1185,7 @@ export default {
 .modal-header h3 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: var(--primary);
+  color: var(--color-primary);
 }
 
 .modal-summary {
@@ -1437,7 +1437,7 @@ export default {
 .rec-icon {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: var(--primary);
+  color: var(--color-primary);
   text-align: center;
 }
 
@@ -1456,7 +1456,7 @@ export default {
 .recomendacion-card li {
   padding: 0.75rem;
   margin-bottom: 0.5rem;
-  background: #f5f7fa;
+  background: var(--color-bg);
   border-radius: 8px;
   color: var(--color-text);
   position: relative;

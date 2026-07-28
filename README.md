@@ -1,10 +1,10 @@
 ﻿# METGO Paine
 
 Clima y **criósfera** en **Torres del Paine** (Patagonia chilena).  
-Línea **METGO Glaciares** · SPA Vue 3 + Vuex + Vite · datos Open-Meteo + metgo-api.
+Línea **METGO Glaciares** · SPA Vue 3 + Vuex + Vite · shell visual alineado a Quillota/Copiapó (identidad **cian** `#22d3ee`).
 
-> Hosting canónico: **Cloudflare Pages** (`metgo-paine`).  
-> Netlify (`metgo-paine.netlify.app`) se mantiene solo por compatibilidad; stop builds tras cutover.
+> **Hosting canónico:** [Cloudflare Pages](https://metgo-paine.pages.dev/) (`metgo-paine`).  
+> **Netlify:** en **stand-by** — no conectar builds nuevos; no usar como producción.
 
 ## Local
 
@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Puerto Vite por defecto: **5173** (o el que asigne Vite).
+Puerto Vite: **5174** (evita choque con otras SPAs).
 
 ## Variables de entorno
 
@@ -24,22 +24,24 @@ Copia `.env.example` → `.env`:
 | `VITE_METGO_API` | Base API (`https://metgo-api.onrender.com/api`) |
 | `VITE_SUPABASE_URL` | Supabase (módulo Carretera Austral) |
 | `VITE_SUPABASE_ANON_KEY` | Anon key Supabase |
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps JS API (ruta `/carretera`) |
+| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps JS API (`/carretera`) |
 
-Sin Supabase/Maps, `/carretera` usa seed local embebido.
+Sin Supabase/Maps, `/carretera` usa seed local.
 
 ## Auth (E9)
 
-Login JWT contra metgo-api, sitio `paine`:
+Login JWT contra metgo-api (misma UX que Quillota):
 
 - Demo: `paine` / `paine123`
-- Admin multi-sitio: `admin` / `admin123` (si aplica)
+
+## Pronóstico
+
+Open-Meteo vía `weatherService` + fallback `metgo-api` (`sitio=paine`) — **sin cambio de fuente de datos** respecto al flujo multi-sitio.
 
 ## Build / Cloudflare Pages
 
 ```bash
 npm run build
-# Deploy manual:
 npm run pages:deploy
 ```
 
@@ -50,22 +52,19 @@ npm run pages:deploy
 | Build output | `dist` |
 | Node | `20` |
 
-Proxy SPA + API: `public/_redirects` → `/api/*` a Render.
+## Netlify (stand-by)
 
-## Cutover desde Netlify
-
-1. Deploy en Cloudflare Pages y validar `/`, `/meteo`, login, `/api/health`.
-2. Añadir `https://metgo-paine.pages.dev` a `METGO_CORS_ORIGINS` en Render (plantilla en monorepo `render.yaml`).
-3. En Netlify: **Stop builds**.
-4. (Opcional) Dominio custom en CF Pages.
+1. No vincular deploys nuevos a Netlify.
+2. En el sitio Netlify antiguo: **Stop builds** / pausar auto-publish.
+3. DNS y usuarios → Cloudflare Pages.
 
 ## Módulos
 
-- Meteorología / precipitación / lugares TDP
-- **Carretera Austral** (`/carretera`) — mapa Google Maps + tramos pavimento/ripio (Supabase Realtime)
+- Meteorología / precipitación / lugares TDP (Open-Meteo)
+- Carretera Austral (`/carretera`)
 
 ## Marca
 
-- Sitio corporativo: https://metgo3d.com  
-- Plataforma Quillota: https://metgo-quillota.pages.dev  
-- Este producto: clima TDP / glaciares / rutas Patagonia
+- Corporativo: https://metgo3d.com  
+- Quillota: https://metgo-quillota.pages.dev  
+- Este producto: https://metgo-paine.pages.dev  

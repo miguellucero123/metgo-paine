@@ -164,7 +164,7 @@ function linkIsActive(link) {
 </script>
 
 <template>
-  <aside class="sidebar" aria-label="Navegación principal">
+  <aside id="metgo-sidebar" class="sidebar" aria-label="Navegación principal">
     <div class="sidebar__brand">
       <span class="sidebar__mark">{{ (site.productName || 'M').charAt(0) }}</span>
       <div class="sidebar__brand-text">
@@ -408,12 +408,22 @@ function linkIsActive(link) {
   opacity: 0.75;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(280px, 88vw);
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--color-border);
     max-height: none;
+  }
+  :global(.app-shell--nav-open) .sidebar {
+    transform: translateX(0);
   }
 }
 </style>

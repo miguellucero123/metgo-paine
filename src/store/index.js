@@ -10,7 +10,7 @@ import authService, {
 } from '@services/authService';
 import { lugares as staticLugares } from '@/data/lugares.js';
 
-const SESSION_KEY = 'climatorre_vuex_session';
+const SESSION_KEY = 'metgo_paine_vuex_session';
 
 function cloneStaticLugares() {
   return staticLugares.map((l) => JSON.parse(JSON.stringify(l)));
@@ -39,15 +39,14 @@ function guestPrefsFromStorage() {
     return { tempUnit: 'C', theme: 'dark' };
   }
   const tu =
+    localStorage.getItem('metgo_paine_guest_tempUnit') ||
     localStorage.getItem('climatorre_guest_tempUnit') ||
     localStorage.getItem('tempUnit') ||
     'C';
-  const themeRaw =
-    localStorage.getItem('climatorre_guest_theme') || localStorage.getItem('theme');
   return {
     tempUnit: tu === 'F' ? 'F' : 'C',
-    /* Tema Quillota: oscuro por defecto */
-    theme: themeRaw === 'light' ? 'light' : 'dark'
+    /* Shell METGO: oscuro fijo (como Quillota/Copiapó) */
+    theme: 'dark'
   };
 }
 
@@ -99,13 +98,10 @@ function persistState(state) {
 
 function persistGuestPrefs(state) {
   if (typeof localStorage === 'undefined') return;
-  localStorage.setItem('climatorre_guest_tempUnit', state.preferences.tempUnit);
-  localStorage.setItem(
-    'climatorre_guest_theme',
-    state.preferences.theme === 'dark' ? 'dark' : 'light'
-  );
+  localStorage.setItem('metgo_paine_guest_tempUnit', state.preferences.tempUnit);
+  localStorage.setItem('metgo_paine_guest_theme', 'dark');
   localStorage.setItem('tempUnit', state.preferences.tempUnit);
-  localStorage.setItem('theme', state.preferences.theme === 'dark' ? 'dark' : 'light');
+  localStorage.setItem('theme', 'dark');
 }
 
 export default createStore({
@@ -218,11 +214,8 @@ export default createStore({
     },
     logout({ commit, state }) {
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('climatorre_guest_tempUnit', state.preferences.tempUnit);
-        localStorage.setItem(
-          'climatorre_guest_theme',
-          state.preferences.theme === 'dark' ? 'dark' : 'light'
-        );
+        localStorage.setItem('metgo_paine_guest_tempUnit', state.preferences.tempUnit);
+        localStorage.setItem('metgo_paine_guest_theme', 'dark');
       }
       logoutApi();
       commit('CLEAR_USER');
