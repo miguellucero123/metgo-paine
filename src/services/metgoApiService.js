@@ -3,18 +3,13 @@
  * Sin JWT — endpoints /api/public/*
  */
 import site from '@/site.config.js'
+import { resolveMetgoApiBase } from '@/utils/resolveMetgoApiBase.js'
 
-const RENDER_API = site.api?.defaultPublicBase || 'https://metgo-api.onrender.com/api'
 const SITIO = site.sitio
 const TIMEOUT_MS = 45000
 
 function resolveBaseURL() {
-  const fromEnv = import.meta.env.VITE_METGO_API || import.meta.env.VITE_API_BASE
-  if (fromEnv) return String(fromEnv).replace(/\/$/, '')
-  if (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')) {
-    return RENDER_API
-  }
-  return site.api?.localBase || 'http://127.0.0.1:8080/api'
+  return resolveMetgoApiBase()
 }
 
 async function fetchJson(path, { timeout = TIMEOUT_MS } = {}) {

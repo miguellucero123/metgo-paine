@@ -188,7 +188,8 @@ export const weatherService = {
   },
 
   async fetchFromOpenMeteo() {
-    const promises = staticLugares.map(async (lugar) => {
+    const updated = []
+    for (const lugar of staticLugares) {
       const url =
         `https://api.open-meteo.com/v1/forecast?latitude=${lugar.coordenadas.lat}` +
         `&longitude=${lugar.coordenadas.lon}` +
@@ -196,11 +197,16 @@ export const weatherService = {
         `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max` +
         `&timezone=auto`
       const response = await fetch(url)
+      if (response.status === 429) {
+        throw new Error('Open-Meteo HTTP 429')
+      }
       if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status}`)
       const data = await response.json()
-      return this.transformData(lugar, data)
-    })
-    return Promise.all(promises)
+      updated.push(this.transformData(lugar, data))
+      // Evitar rate-limit al pedir muchos puntos seguidos (fallback sin API)
+      await new Promise((r) => setTimeout(r, 350))
+    }
+    return updated
   },
 
   transformData(lugarBase, apiData) {

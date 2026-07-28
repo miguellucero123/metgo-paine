@@ -3,23 +3,15 @@
  * Patrón Copiapó/Mantos; adapta resolveBaseURL a site.config.
  */
 import site from '@/site.config.js'
+import { resolveMetgoApiBase } from '@/utils/resolveMetgoApiBase.js'
 
-const RENDER_API = site.api?.defaultPublicBase || 'https://metgo-api.onrender.com/api'
 const TOKEN_KEY = `${site.storagePrefix || 'metgo'}_access_token`
 const USER_KEY = `${site.storagePrefix || 'metgo'}_user`
 const SITIO = site.sitio
 const TIMEOUT_MS = 60000
 
 function resolveBaseURL() {
-  const fromEnv = import.meta.env.VITE_METGO_API || import.meta.env.VITE_API_BASE
-  if (fromEnv) return String(fromEnv).replace(/\/$/, '')
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname
-    if (host.includes('netlify.app') || host.includes('pages.dev')) {
-      return RENDER_API
-    }
-  }
-  return site.api?.localBase || RENDER_API
+  return resolveMetgoApiBase()
 }
 
 export function getToken() {
