@@ -1464,7 +1464,7 @@ export default {
 }
 
 .recomendacion-card li::before {
-  content: 'âœ“';
+  content: '\2713';
   position: absolute;
   left: 0.75rem;
   color: var(--color-primary);
