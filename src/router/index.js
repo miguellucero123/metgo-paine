@@ -13,6 +13,8 @@ import Login from '@views/Login.vue'
 import Registro from '@views/Registro.vue'
 import Favoritos from '@views/Favoritos.vue'
 import PreferenciasClima from '@views/PreferenciasClima.vue'
+import CarreteraMapView from '@views/CarreteraMapView.vue'
+import site from '@/site.config.js'
 
 const routes = [
   {
@@ -39,6 +41,16 @@ const routes = [
     component: PrecipitacionView,
     meta: { title: 'Precipitación — METGO Paine' },
   },
+  ...(site.modules?.carretera
+    ? [
+        {
+          path: '/carretera',
+          name: 'CarreteraAustral',
+          component: CarreteraMapView,
+          meta: { title: 'Carretera Austral — METGO Paine' },
+        },
+      ]
+    : []),
   {
     path: '/login',
     name: 'Login',

@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "pages:deploy": "npm run build && npx wrangler pages deploy dist --project-name=metgo-paine",
     "build-css": "sass scss/main.scss css/main.css",
     "watch-css": "sass --watch scss/main.scss css/main.css"
   },
@@ -22,6 +23,8 @@
   "author": "METGO 3D SpA",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@supabase/supabase-js": "^2.49.1",
     "echarts": "^6.1.0",
     "lucide-vue-next": "^0.574.0",
     "vue": "^3.4.15",

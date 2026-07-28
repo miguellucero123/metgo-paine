@@ -1,0 +1,10 @@
+# Cloudflare Pages — METGO Paine
+# Docs: monorepo docs/manuales/DESPLIEGUE_VUE_CLOUDFLARE.md
+#
+# CLI local (opcional):
+#   npm run build
+#   npx wrangler pages deploy dist --project-name=metgo-paine
+
+name = "metgo-paine"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "dist"

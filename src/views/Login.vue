@@ -12,13 +12,13 @@
 
       <form @submit.prevent="onSubmit">
         <label class="field">
-          <span>Correo electrónico</span>
+          <span>Usuario</span>
           <input
-            v-model.trim="email"
-            type="email"
-            autocomplete="email"
+            v-model.trim="username"
+            type="text"
+            autocomplete="username"
             required
-            placeholder="tu@correo.cl"
+            placeholder="paine"
           />
         </label>
 
@@ -45,7 +45,7 @@
         ¿No tienes cuenta?
         <router-link to="/registro">Regístrate</router-link>
       </p>
-      <p class="hint">Auth local (navegador) · favoritos y preferencias</p>
+      <p class="hint">JWT · sitio <code>paine</code> · demo <code>paine</code> / <code>paine123</code></p>
     </div>
   </div>
 </template>
@@ -54,17 +54,21 @@
 import { mapActions } from 'vuex'
 import { LogIn, Mountain } from 'lucide-vue-next'
 import { sanitizeRedirectPath } from '@utils/sanitizeRedirectPath.js'
+import { wakeApi } from '@services/authApi.js'
 
 export default {
   name: 'LoginView',
   components: { LogIn, Mountain },
   data() {
     return {
-      email: '',
+      username: '',
       password: '',
       error: '',
       loading: false,
     }
+  },
+  mounted() {
+    wakeApi().catch(() => {})
   },
   methods: {
     ...mapActions(['login']),
@@ -72,8 +76,9 @@ export default {
       this.error = ''
       this.loading = true
       try {
+        await wakeApi()
         await this.login({
-          email: this.email,
+          username: this.username,
           password: this.password,
         })
         const q = this.$route.query.redirect

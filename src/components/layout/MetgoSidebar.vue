@@ -14,6 +14,8 @@ import {
   ChevronDown,
   Home,
   UserCog,
+  Route,
+  Map,
 } from 'lucide-vue-next'
 import siteConfig from '@/site.config.js'
 
@@ -48,6 +50,19 @@ const gruposDef = [
         : []),
     ],
   },
+  ...(site.modules?.carretera
+    ? [
+        {
+          id: 'rutas',
+          label: 'Rutas / Patagonia',
+          icon: Route,
+          match: (path) => path.startsWith('/carretera'),
+          items: [
+            { to: '/carretera', label: 'Carretera Austral', icon: Map },
+          ],
+        },
+      ]
+    : []),
   {
     id: 'cuenta',
     label: 'Cuenta',

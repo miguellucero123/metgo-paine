@@ -23,8 +23,13 @@ export default {
     meteo: true,
     precipitacion: true,
     lugares: true,
+    carretera: true,
     aire: false,
     operaciones: false,
+  },
+  api: {
+    defaultPublicBase: 'https://metgo-api.onrender.com/api',
+    localBase: 'http://127.0.0.1:8080/api',
   },
   storagePrefix: 'metgo_paine',
   copy: {

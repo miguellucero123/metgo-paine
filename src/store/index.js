@@ -3,7 +3,11 @@
  */
 
 import { createStore } from 'vuex';
-import authService from '@services/authService';
+import authService, {
+  hydrateFromStorage,
+  logoutApi,
+  ensureValidSession,
+} from '@services/authService';
 import { lugares as staticLugares } from '@/data/lugares.js';
 
 const SESSION_KEY = 'climatorre_vuex_session';
@@ -47,25 +51,35 @@ function guestPrefsFromStorage() {
   };
 }
 
+const jwtHydrated = hydrateFromStorage();
 const persisted = loadPersistedSession();
+const bootUser = jwtHydrated || persisted?.user || null;
 
-const initialState = persisted?.user
+const initialState = bootUser
   ? {
-      user: persisted.user,
+      user: bootUser,
       preferences: {
-        tempUnit: persisted.preferences?.tempUnit || 'C',
-        theme: persisted.preferences?.theme || 'dark'
+        tempUnit:
+          bootUser.preferences?.tempUnit ||
+          persisted?.preferences?.tempUnit ||
+          'C',
+        theme:
+          bootUser.preferences?.theme ||
+          persisted?.preferences?.theme ||
+          'dark',
       },
-      favoriteIds: Array.isArray(persisted.favoriteIds)
-        ? [...persisted.favoriteIds]
-        : [...(persisted.user.favoriteIds || [])],
-      ...structuredClone(weatherState)
+      favoriteIds: Array.isArray(bootUser.favoriteIds)
+        ? [...bootUser.favoriteIds]
+        : Array.isArray(persisted?.favoriteIds)
+          ? [...persisted.favoriteIds]
+          : [],
+      ...structuredClone(weatherState),
     }
   : {
       user: null,
       preferences: guestPrefsFromStorage(),
       favoriteIds: [],
-      ...structuredClone(weatherState)
+      ...structuredClone(weatherState),
     };
 
 function persistState(state) {
@@ -171,15 +185,15 @@ export default createStore({
     }
   },
   actions: {
-    async login({ commit, state }, { email, password }) {
-      const result = await authService.login(email, password);
+    async login({ commit, state }, { username, email, password }) {
+      const result = await authService.login({ username, email, password });
       if (!result.ok) {
         throw new Error(result.message || 'Error al iniciar sesión');
       }
       commit('SET_USER', {
         ...result.user,
         favoriteIds: result.user.favoriteIds || [],
-        preferences: result.user.preferences || { tempUnit: 'C', theme: 'light' }
+        preferences: result.user.preferences || { tempUnit: 'C', theme: 'dark' },
       });
       persistState(state);
     },
@@ -191,9 +205,16 @@ export default createStore({
       commit('SET_USER', {
         ...result.user,
         favoriteIds: result.user.favoriteIds || [],
-        preferences: result.user.preferences || { tempUnit: 'C', theme: 'light' }
+        preferences: result.user.preferences || { tempUnit: 'C', theme: 'dark' },
       });
       persistState(state);
+    },
+    async restoreSession({ commit, state }) {
+      const me = await ensureValidSession();
+      if (!me) return false;
+      commit('SET_USER', me);
+      persistState(state);
+      return true;
     },
     logout({ commit, state }) {
       if (typeof localStorage !== 'undefined') {
@@ -203,6 +224,7 @@ export default createStore({
           state.preferences.theme === 'dark' ? 'dark' : 'light'
         );
       }
+      logoutApi();
       commit('CLEAR_USER');
       persistState(state);
     },
