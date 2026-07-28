@@ -22,10 +22,13 @@ Copia `.env.example` → `.env`:
 | Variable | Uso |
 |----------|-----|
 | `VITE_METGO_API` | Base API (`https://metgo-api.onrender.com/api`) |
-| `VITE_SUPABASE_URL` | Supabase (módulo Carretera Austral, opcional) |
-| `VITE_SUPABASE_ANON_KEY` | Anon key Supabase (opcional) |
+| `VITE_SUPABASE_URL` | Solo Project URL: `https://xxxx.supabase.co` (Settings → API). **Sin** `/rest/v1` ni URL del dashboard |
+| `VITE_SUPABASE_ANON_KEY` | `anon` `public` (Settings → API) |
 
 `/carretera` usa **Leaflet + OpenStreetMap** (sin API key). Sin Supabase usa seed local.
+
+> Si abres `https://xxxx.supabase.co/` en el navegador y ves `{"error":"requested path is invalid"}`, es **normal**: esa URL es la API, no una página web.
+
 
 ## Auth (E9)
 
