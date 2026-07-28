@@ -5,7 +5,7 @@
         <p class="ca-eyebrow">Rutas · Patagonia</p>
         <h1>Carretera Austral</h1>
         <p class="ca-lead">
-          Tramos coloreados por tipo de camino. Actualización en tiempo real vía Supabase.
+          Tramos coloreados por tipo de camino. Mapa OpenStreetMap (Leaflet); datos locales o Supabase.
         </p>
       </header>
 

@@ -5,7 +5,8 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { Loader } from '@googlemaps/js-api-loader'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import { colorPorTipo } from '@/data/carreteraAustral.js'
 
 const props = defineProps({
@@ -19,112 +20,85 @@ const emit = defineEmits(['select-tramo'])
 const mapEl = ref(null)
 const mapError = ref('')
 let map = null
-let polylines = []
-let markers = []
-let infoWindow = null
-
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+let layerGroup = null
 
 function clearOverlays() {
-  polylines.forEach((p) => p.setMap(null))
-  markers.forEach((m) => m.setMap(null))
-  polylines = []
-  markers = []
+  if (layerGroup) {
+    layerGroup.clearLayers()
+  }
+}
+
+function popupTramo(tramo) {
+  const pct =
+    tramo.tipo_camino === 'mixto' ? ` · ${tramo.pct_pavimento}% pavimento` : ''
+  return `
+    <div class="ca-iw">
+      <strong>${tramo.origen} → ${tramo.destino}</strong><br/>
+      ${tramo.distancia_km} km · ${tramo.tipo_camino}${pct}<br/>
+      ${tramo.velocidad_kmh} km/h · ${Number(tramo.tiempo_hrs).toFixed(2)} h
+    </div>
+  `
 }
 
 function drawTramos() {
-  if (!map || !window.google?.maps) return
+  if (!map || !layerGroup) return
   clearOverlays()
 
   props.tramos.forEach((tramo) => {
-    const path = [
-      { lat: Number(tramo.lat_origen), lng: Number(tramo.lng_origen) },
-      { lat: Number(tramo.lat_destino), lng: Number(tramo.lng_destino) },
+    const latlngs = [
+      [Number(tramo.lat_origen), Number(tramo.lng_origen)],
+      [Number(tramo.lat_destino), Number(tramo.lng_destino)],
     ]
     const selected = props.selectedId && String(props.selectedId) === String(tramo.id)
-    const polyline = new google.maps.Polyline({
-      path,
-      geodesic: true,
-      strokeColor: colorPorTipo(tramo.tipo_camino),
-      strokeOpacity: selected ? 1 : 0.85,
-      strokeWeight: selected ? 7 : 5,
-      map,
-      zIndex: selected ? 10 : 1,
+    const line = L.polyline(latlngs, {
+      color: colorPorTipo(tramo.tipo_camino),
+      weight: selected ? 7 : 5,
+      opacity: selected ? 1 : 0.85,
     })
-    polyline.addListener('click', (e) => {
-      emit('select-tramo', tramo)
-      if (infoWindow) {
-        const pct =
-          tramo.tipo_camino === 'mixto'
-            ? ` · ${tramo.pct_pavimento}% pavimento`
-            : ''
-        infoWindow.setContent(`
-          <div class="ca-iw">
-            <strong>${tramo.origen} → ${tramo.destino}</strong><br/>
-            ${tramo.distancia_km} km · ${tramo.tipo_camino}${pct}<br/>
-            ${tramo.velocidad_kmh} km/h · ${Number(tramo.tiempo_hrs).toFixed(2)} h
-          </div>
-        `)
-        infoWindow.setPosition(e.latLng)
-        infoWindow.open(map)
-      }
-    })
-    polylines.push(polyline)
+    line.bindPopup(popupTramo(tramo))
+    line.on('click', () => emit('select-tramo', tramo))
+    layerGroup.addLayer(line)
   })
 
   props.localidades.forEach((loc) => {
-    const marker = new google.maps.Marker({
-      position: { lat: Number(loc.lat), lng: Number(loc.lng) },
-      map,
-      title: loc.nombre,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 5,
-        fillColor: '#22d3ee',
-        fillOpacity: 0.95,
-        strokeColor: '#0e7490',
-        strokeWeight: 1.5,
-      },
+    const marker = L.circleMarker([Number(loc.lat), Number(loc.lng)], {
+      radius: 6,
+      color: '#0e7490',
+      weight: 1.5,
+      fillColor: '#22d3ee',
+      fillOpacity: 0.95,
     })
-    marker.addListener('click', () => {
-      if (infoWindow) {
-        infoWindow.setContent(`<strong>${loc.nombre}</strong>`)
-        infoWindow.open(map, marker)
-      }
-    })
-    markers.push(marker)
+    marker.bindPopup(`<strong>${loc.nombre}</strong>`)
+    marker.bindTooltip(loc.nombre, { direction: 'top', offset: [0, -6] })
+    layerGroup.addLayer(marker)
   })
 }
 
-async function initMap() {
-  if (!mapEl.value) return
-  if (!apiKey) {
-    mapError.value =
-      'Falta VITE_GOOGLE_MAPS_API_KEY. Configúrala en .env o Cloudflare Pages; el panel lateral sigue activo con datos locales.'
-    return
-  }
+function initMap() {
+  if (!mapEl.value || map) return
   try {
-    const loader = new Loader({
-      apiKey,
-      version: 'weekly',
-    })
-    await loader.load()
-    map = new google.maps.Map(mapEl.value, {
-      center: { lat: -45.0, lng: -72.2 },
+    map = L.map(mapEl.value, {
+      center: [-45.0, -72.2],
       zoom: 6,
-      mapTypeId: 'terrain',
-      mapTypeControl: true,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles: [
-        { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-        { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-      ],
+      zoomControl: true,
     })
-    infoWindow = new google.maps.InfoWindow()
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map)
+
+    layerGroup = L.layerGroup().addTo(map)
     drawTramos()
+
+    // Leaflet needs a resize after layout settles in flex/grid containers
+    requestAnimationFrame(() => {
+      map?.invalidateSize()
+    })
+    setTimeout(() => map?.invalidateSize(), 200)
   } catch (e) {
-    mapError.value = e?.message || 'No se pudo cargar Google Maps'
+    mapError.value = e?.message || 'No se pudo cargar el mapa'
   }
 }
 
@@ -142,7 +116,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearOverlays()
-  map = null
+  if (map) {
+    map.remove()
+    map = null
+  }
+  layerGroup = null
 })
 </script>
 
@@ -152,7 +130,33 @@ onUnmounted(() => {
   height: 100%;
   min-height: 320px;
   background: #0f172a;
+  z-index: 0;
 }
+
+.ca-map :deep(.leaflet-container) {
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  font-family: inherit;
+}
+
+.ca-map :deep(.leaflet-popup-content-wrapper) {
+  background: #111827;
+  color: #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.ca-map :deep(.leaflet-popup-tip) {
+  background: #111827;
+}
+
+.ca-map :deep(.leaflet-popup-content) {
+  margin: 0.65rem 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
 .ca-map-error {
   position: absolute;
   left: 1rem;

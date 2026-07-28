@@ -23,9 +23,9 @@
   "author": "METGO 3D SpA",
   "license": "ISC",
   "dependencies": {
-    "@googlemaps/js-api-loader": "^1.16.8",
     "@supabase/supabase-js": "^2.49.1",
     "echarts": "^6.1.0",
+    "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.574.0",
     "vue": "^3.4.15",
     "vue-echarts": "^8.0.1",

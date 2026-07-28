@@ -22,11 +22,10 @@ Copia `.env.example` → `.env`:
 | Variable | Uso |
 |----------|-----|
 | `VITE_METGO_API` | Base API (`https://metgo-api.onrender.com/api`) |
-| `VITE_SUPABASE_URL` | Supabase (módulo Carretera Austral) |
-| `VITE_SUPABASE_ANON_KEY` | Anon key Supabase |
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps JS API (`/carretera`) |
+| `VITE_SUPABASE_URL` | Supabase (módulo Carretera Austral, opcional) |
+| `VITE_SUPABASE_ANON_KEY` | Anon key Supabase (opcional) |
 
-Sin Supabase/Maps, `/carretera` usa seed local.
+`/carretera` usa **Leaflet + OpenStreetMap** (sin API key). Sin Supabase usa seed local.
 
 ## Auth (E9)
 
