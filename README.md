@@ -57,6 +57,13 @@ npm run pages:deploy
 2. En el sitio Netlify antiguo: **Stop builds** / pausar auto-publish.
 3. DNS y usuarios → Cloudflare Pages.
 
+Checklist cutover (manual):
+
+- [ ] Netlify `metgo-paine` → Site configuration → Build & deploy → **Stop builds**
+- [ ] Cloudflare Pages Production: `VITE_METGO_API` (+ opcional `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` para Realtime de tramos)
+- [ ] Smoke: https://metgo-paine.pages.dev/carretera (mapa Leaflet, sin banner Google)
+- [ ] Login: `paine` / `paine123`
+
 ## Módulos
 
 - Meteorología / precipitación / lugares TDP (Open-Meteo)
