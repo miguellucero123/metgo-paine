@@ -81,7 +81,7 @@ export async function login({ username, email, password } = {}) {
 
 /**
  * Registro local (navegador) — no crea cuenta en metgo-api.
- * Para cuentas de sitio usar credenciales demos (paine/paine123).
+ * Cuentas de sitio: definir METGO_PASSWORD_* en Render (no demos en UI).
  */
 export function register({ nombre, email, password }) {
   return new Promise((resolve) => {

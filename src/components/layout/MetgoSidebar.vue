@@ -32,9 +32,9 @@ const gruposDef = [
     id: 'principal',
     label: 'Principal',
     icon: Home,
-    match: (path) => path === '/' || path.startsWith('/estado'),
+    match: (path) => path === '/app' || path.startsWith('/estado'),
     items: [
-      { to: '/', label: 'Panel general', icon: LayoutDashboard, exact: true },
+      { to: '/app', label: 'Panel general', icon: LayoutDashboard, exact: true },
       { to: '/estado', label: 'Estado sistema', icon: Activity },
     ],
   },

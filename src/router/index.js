@@ -1,44 +1,47 @@
 /**
- * Vue Router — METGO Paine (shell tipo Quillota)
+ * Vue Router — METGO Paine
+ * / = landing pública · /app = panel (JWT) · resto requiere sesión
  */
 
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '@store/index.js'
-import DashboardView from '@views/DashboardView.vue'
-import Home from '@views/Home.vue'
-import EstadoView from '@views/EstadoView.vue'
-import PrecipitacionView from '@views/PrecipitacionView.vue'
-import LugarDetalle from '@views/LugarDetalle.vue'
-import Login from '@views/Login.vue'
-import Registro from '@views/Registro.vue'
-import Favoritos from '@views/Favoritos.vue'
-import PreferenciasClima from '@views/PreferenciasClima.vue'
-import CarreteraMapView from '@views/CarreteraMapView.vue'
+import { ensureValidSession } from '@services/authService.js'
+import { getToken } from '@services/authApi.js'
 import site from '@/site.config.js'
 
 const routes = [
   {
     path: '/',
+    name: 'Landing',
+    component: () => import('@views/LandingPaineView.vue'),
+    meta: { title: 'METGO Paine — Glaciares · Torres del Paine', public: true },
+  },
+  {
+    path: '/app',
     name: 'Dashboard',
-    component: DashboardView,
+    component: () => import('@views/DashboardView.vue'),
     meta: { title: 'Panel general — METGO Paine' },
+  },
+  {
+    path: '/dashboard',
+    redirect: { name: 'Dashboard' },
   },
   {
     path: '/estado',
     name: 'Estado',
-    component: EstadoView,
+    component: () => import('@views/EstadoView.vue'),
     meta: { title: 'Estado sistema — METGO Paine' },
   },
   {
     path: '/meteo',
     name: 'Meteo',
-    component: Home,
+    component: () => import('@views/Home.vue'),
     meta: { title: 'Meteorología — METGO Paine' },
   },
   {
     path: '/meteo/precipitacion',
     name: 'Precipitacion',
-    component: PrecipitacionView,
+    component: () => import('@views/PrecipitacionView.vue'),
     meta: { title: 'Precipitación — METGO Paine' },
   },
   ...(site.modules?.carretera
@@ -46,7 +49,7 @@ const routes = [
         {
           path: '/carretera',
           name: 'CarreteraAustral',
-          component: CarreteraMapView,
+          component: () => import('@views/CarreteraMapView.vue'),
           meta: { title: 'Carretera Austral — METGO Paine' },
         },
       ]
@@ -54,31 +57,37 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login,
-    meta: { title: 'Iniciar sesión', guestOnly: true },
+    component: () => import('@views/Login.vue'),
+    meta: { title: 'Iniciar sesión', public: true, guestOnly: true },
   },
   {
     path: '/registro',
     name: 'Registro',
-    component: Registro,
-    meta: { title: 'Registro', guestOnly: true },
+    component: () => import('@views/Registro.vue'),
+    meta: { title: 'Registro', public: true, guestOnly: true },
+  },
+  {
+    path: '/verificar',
+    name: 'Verificar',
+    component: () => import('@views/VerificarEmail.vue'),
+    meta: { title: 'Verificar email', public: true },
   },
   {
     path: '/favoritos',
     name: 'Favoritos',
-    component: Favoritos,
-    meta: { title: 'Mis favoritos', requiresAuth: true },
+    component: () => import('@views/Favoritos.vue'),
+    meta: { title: 'Mis favoritos' },
   },
   {
     path: '/preferencias-clima',
     name: 'PreferenciasClima',
-    component: PreferenciasClima,
-    meta: { title: 'Preferencias de clima', requiresAuth: true },
+    component: () => import('@views/PreferenciasClima.vue'),
+    meta: { title: 'Preferencias de clima' },
   },
   {
     path: '/lugar/:id',
     name: 'LugarDetalle',
-    component: LugarDetalle,
+    component: () => import('@views/LugarDetalle.vue'),
     props: true,
     meta: { title: 'Detalle del lugar — METGO Paine' },
   },
@@ -97,20 +106,38 @@ const router = createRouter({
   },
 })
 
-router.beforeEach((to, from, next) => {
-  if (!['/login', '/registro'].includes(to.path)) {
+router.beforeEach(async (to, from, next) => {
+  if (!to.meta.public) {
     sessionStorage.setItem('lastRoute', to.fullPath)
   }
 
-  document.title = to.meta.title || 'METGO Paine — Torres del Paine'
+  document.title = to.meta.title || site.documentTitle || 'METGO Paine'
 
-  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+  // Rutas públicas: landing siempre accesible; login/registro solo si NO hay JWT válido
+  if (to.meta.public) {
+    if (to.meta.guestOnly && getToken()) {
+      const user = await ensureValidSession()
+      if (user) {
+        next({ name: 'Dashboard' })
+        return
+      }
+      store.dispatch('logout')
+    }
+    next()
+    return
+  }
+
+  // Panel y resto: JWT obligatorio
+  if (!getToken() || !store.getters.isAuthenticated) {
+    if (store.state.user) store.dispatch('logout')
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
 
-  if (to.meta.guestOnly && store.getters.isAuthenticated) {
-    next('/')
+  const user = await ensureValidSession()
+  if (!user) {
+    store.dispatch('logout')
+    next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
 

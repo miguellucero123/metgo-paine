@@ -50,12 +50,26 @@ function diaDesdeFecha(fecha) {
   return DAYS[date.getDay()] || d
 }
 
+/** API metgo: precipitacion = mm; probabilidad_lluvia/pop = %. */
+function precipProbPct(r) {
+  const p = Number(r?.probabilidad_lluvia ?? r?.pop)
+  if (Number.isFinite(p)) return Math.round(p)
+  return null
+}
+
+function precipMm(r) {
+  const p = Number(r?.precipitacion)
+  return Number.isFinite(p) ? p : 0
+}
+
 function estadoDesdeResumen(r) {
-  const p = Number(r?.precipitacion) || 0
+  const mm = precipMm(r)
+  const pop = precipProbPct(r)
   const tmin = Number(r?.temperatura_min)
+  if (!Number.isNaN(tmin) && tmin <= 0 && (mm > 0 || (pop != null && pop >= 20))) return 'Nieve'
   if (!Number.isNaN(tmin) && tmin <= 0) return 'Nieve'
-  if (p >= 5) return 'Lluvioso'
-  if (p >= 1) return 'Nublado'
+  if (mm >= 5 || (pop != null && pop >= 70)) return 'Lluvioso'
+  if (mm >= 1 || (pop != null && pop >= 40)) return 'Nublado'
   return 'Soleado'
 }
 
@@ -161,7 +175,9 @@ export const weatherService = {
       min: Math.round(Number(r.temperatura_min) || 0),
       max: Math.round(Number(r.temperatura_max) || 0),
       estado: estadoDesdeResumen(r),
-      precipitacion: Math.round(Number(r.precipitacion) || 0),
+      // UI/%: probabilidad_lluvia; mm queda en precipitacionMm
+      precipitacion: precipProbPct(r) ?? Math.round(precipMm(r)),
+      precipitacionMm: Math.round(precipMm(r) * 10) / 10,
       viento: Math.round(Number(r.viento) || 0),
     }))
 

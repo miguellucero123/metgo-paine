@@ -14,7 +14,7 @@
         <HeartOff :size="56" />
         <h2>Aún no tienes favoritos</h2>
         <p>Explora el inicio y marca los lugares que más te interesen.</p>
-        <router-link to="/" class="btn-link">Ir al inicio</router-link>
+        <router-link to="/app" class="btn-link">Ir al panel</router-link>
       </div>
 
       <section v-else class="places-grid">

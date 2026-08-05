@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthPage" class="app-login">
+  <div v-if="isPublicShell" class="app-login" :class="{ 'app-login--landing': route.name === 'Landing' }">
     <router-view />
   </div>
   <div v-else class="app-shell" :class="{ 'app-shell--nav-open': navOpen }">
@@ -42,8 +42,8 @@ provide('closeNav', () => {
 })
 
 const preferences = computed(() => store.state.preferences)
-const isAuthPage = computed(
-  () => route.name === 'Login' || route.name === 'Registro'
+const isPublicShell = computed(() =>
+  ['Landing', 'Login', 'Registro', 'Verificar'].includes(route.name)
 )
 
 watch(
@@ -53,3 +53,11 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+.app-login--landing {
+  min-height: 100vh;
+  padding: 0;
+  background: transparent;
+}
+</style>

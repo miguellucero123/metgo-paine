@@ -8,6 +8,7 @@ import authService, {
   logoutApi,
   ensureValidSession,
 } from '@services/authService';
+import { getToken, clearSession } from '@services/authApi.js';
 import { lugares as staticLugares } from '@/data/lugares.js';
 
 const SESSION_KEY = 'metgo_paine_vuex_session';
@@ -34,6 +35,14 @@ function loadPersistedSession() {
   }
 }
 
+function applyDomTheme(theme) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute(
+    'data-theme',
+    theme === 'light' ? 'light' : 'dark',
+  );
+}
+
 function guestPrefsFromStorage() {
   if (typeof localStorage === 'undefined') {
     return { tempUnit: 'C', theme: 'dark' };
@@ -43,16 +52,35 @@ function guestPrefsFromStorage() {
     localStorage.getItem('climatorre_guest_tempUnit') ||
     localStorage.getItem('tempUnit') ||
     'C';
+  const th =
+    localStorage.getItem('metgo_paine_guest_theme') ||
+    localStorage.getItem('theme') ||
+    'dark';
   return {
     tempUnit: tu === 'F' ? 'F' : 'C',
-    /* Shell METGO: oscuro fijo (como Quillota/Copiapó) */
-    theme: 'dark'
+    theme: th === 'light' ? 'light' : 'dark',
   };
 }
 
-const jwtHydrated = hydrateFromStorage();
-const persisted = loadPersistedSession();
-const bootUser = jwtHydrated || persisted?.user || null;
+/** Solo sesión JWT metgo-api. Ignora user local sin token (registro legacy). */
+function bootAuthUser() {
+  const token = typeof localStorage !== 'undefined' ? getToken() : '';
+  if (!token) {
+    // Limpia sesión Vuex / user stale sin JWT
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      clearSession();
+    } catch {
+      /* ignore */
+    }
+    return null;
+  }
+  return hydrateFromStorage();
+}
+
+const jwtHydrated = bootAuthUser();
+const persisted = jwtHydrated ? loadPersistedSession() : null;
+const bootUser = jwtHydrated;
 
 const initialState = bootUser
   ? {
@@ -86,6 +114,7 @@ function persistState(state) {
     localStorage.removeItem(SESSION_KEY);
     return;
   }
+  applyDomTheme(state.preferences?.theme === 'light' ? 'light' : 'dark');
   localStorage.setItem(
     SESSION_KEY,
     JSON.stringify({
@@ -98,16 +127,19 @@ function persistState(state) {
 
 function persistGuestPrefs(state) {
   if (typeof localStorage === 'undefined') return;
+  const theme = state.preferences.theme === 'light' ? 'light' : 'dark';
   localStorage.setItem('metgo_paine_guest_tempUnit', state.preferences.tempUnit);
-  localStorage.setItem('metgo_paine_guest_theme', 'dark');
+  localStorage.setItem('metgo_paine_guest_theme', theme);
   localStorage.setItem('tempUnit', state.preferences.tempUnit);
-  localStorage.setItem('theme', 'dark');
+  localStorage.setItem('theme', theme);
+  applyDomTheme(theme);
 }
 
 export default createStore({
   state: initialState,
   getters: {
-    isAuthenticated: (s) => !!s.user,
+    /** Autenticado = user en store + JWT en localStorage */
+    isAuthenticated: (s) => !!s.user && !!getToken(),
     currentUser: (s) => s.user,
     preferences: (s) => s.preferences,
     favoriteIds: (s) => s.favoriteIds,
@@ -193,17 +225,13 @@ export default createStore({
       });
       persistState(state);
     },
-    async register({ commit, state }, payload) {
+    async register(_ctx, payload) {
+      // Registro local legacy: NO inicia sesión. Usar /registro → register-v2 + /login.
       const result = await authService.register(payload);
       if (!result.ok) {
         throw new Error(result.message || 'No se pudo registrar');
       }
-      commit('SET_USER', {
-        ...result.user,
-        favoriteIds: result.user.favoriteIds || [],
-        preferences: result.user.preferences || { tempUnit: 'C', theme: 'dark' },
-      });
-      persistState(state);
+      return result;
     },
     async restoreSession({ commit, state }) {
       const me = await ensureValidSession();
@@ -223,6 +251,9 @@ export default createStore({
     },
     updatePreferences({ commit, state }, partial) {
       commit('SET_PREFERENCES', partial);
+      if (partial.theme === 'light' || partial.theme === 'dark') {
+        applyDomTheme(partial.theme);
+      }
       if (state.user) {
         persistState(state);
       } else {

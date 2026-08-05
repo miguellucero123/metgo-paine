@@ -9,6 +9,8 @@ import './styles/main.css'
 import './styles/auth-page.css'
 
 applySiteTheme(site)
+const bootTheme = store.state.preferences?.theme === 'light' ? 'light' : 'dark'
+document.documentElement.setAttribute('data-theme', bootTheme)
 
 const app = createApp(App)
 app.provide('site', site)

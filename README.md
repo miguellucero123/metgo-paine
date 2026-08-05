@@ -30,11 +30,34 @@ Copia `.env.example` → `.env`:
 > Si abres `https://xxxx.supabase.co/` en el navegador y ves `{"error":"requested path is invalid"}`, es **normal**: esa URL es la API, no una página web.
 
 
-## Auth (E9)
+## Pronóstico
 
-Login JWT contra metgo-api (misma UX que Quillota):
+Open-Meteo vía `weatherService` + fallback `metgo-api` (`sitio=paine`).
 
-- Demo: `paine` / `paine123`
+### Endpoints GET usados (smoke 2026-08)
+
+| Método | Path | Auth | Estado prod |
+|--------|------|------|-------------|
+| GET | `/api/health` | no | 200 |
+| GET | `/api/public/sitios` | no | 200 (incluye `paine` ×6 estaciones) |
+| GET | `/api/public/estaciones?sitio=paine` | no | 200 array |
+| GET | `/api/public/meteo/<id>` | no | 200 (`temperatura`, `viento` km/h, `precipitacion` **mm**) |
+| GET | `/api/public/meteo/<id>/pronostico?dias=` | no | 200 array (`probabilidad_lluvia` **%**) |
+| GET | `/api/public/planes?sitio=paine` | no | 200 |
+| POST | `/api/auth/login` `{sitio:paine}` | no | JWT |
+| GET | `/api/auth/me` | Bearer | 401 sin token |
+
+**Nota:** en UI, “Precip. %” debe mapear `probabilidad_lluvia` / `pop`, no `precipitacion` (mm).
+
+## Auth (E9) + landing
+
+- **`/`** — landing pública (marketing + resumen en vivo). El panel **no** es público.
+- **`/app`** — panel general (JWT requerido).
+- **`/login`** · **`/registro`** (register-v2 + RUT) · **`/verificar`**
+
+Credenciales: registro verificado, o break-glass `METGO_PASSWORD_PAINE` en Render (no se publica en la UI).
+
+Verify URL en API: `METGO_PAINE_PUBLIC_URL=https://metgo-paine.pages.dev`
 
 ## Pronóstico
 
@@ -65,7 +88,7 @@ Checklist cutover (manual):
 - [ ] Netlify `metgo-paine` → Site configuration → Build & deploy → **Stop builds**
 - [ ] Cloudflare Pages Production: `VITE_METGO_API` (+ opcional `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` para Realtime de tramos)
 - [ ] Smoke: https://metgo-paine.pages.dev/carretera (mapa Leaflet, sin banner Google)
-- [ ] Login: `paine` / `paine123`
+- [ ] Login con cuenta configurada en Render (`METGO_PASSWORD_PAINE` / admin)
 
 ## Módulos
 

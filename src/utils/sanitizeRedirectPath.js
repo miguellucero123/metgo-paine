@@ -6,10 +6,11 @@
  * @returns {string}
  */
 export function sanitizeRedirectPath(path) {
-  if (typeof path !== 'string' || !path.trim()) return '/';
+  if (typeof path !== 'string' || !path.trim()) return '/app';
   const t = path.trim();
-  if (!t.startsWith('/')) return '/';
-  if (t.startsWith('//')) return '/';
-  if (t.includes('://')) return '/';
+  if (!t.startsWith('/')) return '/app';
+  if (t.startsWith('//')) return '/app';
+  if (t.includes('://')) return '/app';
+  if (t === '/' || t === '/login' || t === '/registro' || t === '/verificar') return '/app';
   return t;
 }

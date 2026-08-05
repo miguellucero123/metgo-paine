@@ -85,4 +85,27 @@ export async function wakeApi() {
   }
 }
 
+export async function validateRegistro(body) {
+  try {
+    return await request('/auth/validate-registro', { method: 'POST', body })
+  } catch (e) {
+    if (e.data && typeof e.data.ok === 'boolean') return e.data
+    throw e
+  }
+}
+
+export async function registerV2(body) {
+  return request('/auth/register-v2', { method: 'POST', body, timeout: 90000 })
+}
+
+export async function verifyEmail(token) {
+  return request(`/auth/verify-email?token=${encodeURIComponent(token)}`)
+}
+
+export async function fetchPlanes(sitio = SITIO, faena) {
+  const q = new URLSearchParams({ sitio })
+  if (faena) q.set('faena', faena)
+  return request(`/public/planes?${q}`)
+}
+
 export { TOKEN_KEY, USER_KEY, SITIO, resolveBaseURL }

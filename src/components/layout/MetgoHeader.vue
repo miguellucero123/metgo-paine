@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { MapPin, LogOut, Settings, Activity, Menu } from 'lucide-vue-next'
 import siteConfig from '@/site.config.js'
+import ThemeToggle from '@/components/layout/ThemeToggle.vue'
 
 const site = inject('site', siteConfig)
 const navOpen = inject('navOpen', null)
@@ -23,9 +24,7 @@ function setTempUnit(tempUnit) {
 
 function logout() {
   store.dispatch('logout')
-  if (route.meta?.requiresAuth) {
-    router.push('/')
-  }
+  router.push('/')
 }
 </script>
 
@@ -56,6 +55,7 @@ function logout() {
     </div>
 
     <div class="header__right">
+      <ThemeToggle />
       <div class="status-pill" :class="online ? 'status-pill--on' : 'status-pill--off'">
         <Activity class="status-pill__icon" aria-hidden="true" />
         {{ online ? 'En línea' : 'Sin conexión' }}
