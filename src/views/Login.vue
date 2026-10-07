@@ -15,17 +15,21 @@
       </div>
 
       <form class="auth-form" @submit.prevent="onSubmit">
-        <label class="field">
-          <span>Usuario</span>
+        <p v-if="paso === 'activar'" class="auth-msg">
+          Su cuenta exige doble factor. Agregue la clave en el autenticador y escriba el código de 6 dígitos.
+        </p>
+        <p v-if="paso === 'activar'"><code>{{ semilla && semilla.secret }}</code></p>
+        <label v-if="paso === 'credenciales'" class="field">
+          <span>Correo</span>
           <input
             v-model.trim="username"
-            type="text"
-            autocomplete="username"
+            type="email"
+            autocomplete="email"
             required
           />
         </label>
 
-        <label class="field">
+        <label v-if="paso === 'credenciales'" class="field">
           <span>Contraseña</span>
           <input
             v-model="password"
@@ -35,12 +39,16 @@
             placeholder="••••••••"
           />
         </label>
+        <label v-if="paso !== 'credenciales'" class="field">
+          <span>Código del autenticador</span>
+          <input v-model="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
+        </label>
 
         <p v-if="error" class="auth-msg auth-msg--error" role="alert">{{ error }}</p>
 
         <button type="submit" class="btn btn--full" :disabled="loading">
           <LogIn class="btn-icon" aria-hidden="true" />
-          {{ loading ? 'Entrando…' : 'Entrar' }}
+          {{ loading ? 'Entrando…' : (paso === 'activar' ? 'Activar y entrar' : 'Entrar') }}
         </button>
       </form>
 
@@ -59,7 +67,7 @@
 import { mapActions } from 'vuex'
 import { LogIn, Mountain } from 'lucide-vue-next'
 import { sanitizeRedirectPath } from '@utils/sanitizeRedirectPath.js'
-import { wakeApi } from '@services/authApi.js'
+import { wakeApi, mfaSetup, mfaActivar } from '@services/authApi.js'
 import ThemeToggle from '@/components/layout/ThemeToggle.vue'
 
 export default {
@@ -71,27 +79,37 @@ export default {
       password: '',
       error: '',
       loading: false,
+      paso: 'credenciales',
+      mfaCode: '',
+      tokenActivacion: '',
+      semilla: null,
     }
   },
   mounted() {
     wakeApi().catch(() => {})
   },
   methods: {
-    ...mapActions(['login']),
+    ...mapActions(['login', 'adoptSession']),
     async onSubmit() {
       this.error = ''
       this.loading = true
       try {
-        try {
-          await wakeApi()
-        } catch (e) {
-          this.error = e?.message || 'No se pudo contactar la API. Reintente en un minuto.'
-          return
+        if (this.paso === 'activar') {
+          const data = await mfaActivar(this.tokenActivacion, this.mfaCode.trim())
+          await this.adoptSession(data)
+        } else {
+          try {
+            await wakeApi()
+          } catch (e) {
+            this.error = e?.message || 'No se pudo contactar la API. Reintente en un minuto.'
+            return
+          }
+          await this.login({
+            username: this.username,
+            password: this.password,
+            mfaCode: this.mfaCode.trim(),
+          })
         }
-        await this.login({
-          username: this.username,
-          password: this.password,
-        })
         const q = this.$route.query.redirect
         const fromSession = sessionStorage.getItem('lastRoute')
         const raw = (typeof q === 'string' && q) || fromSession || '/app'
@@ -99,6 +117,19 @@ export default {
         sessionStorage.removeItem('lastRoute')
         await this.$router.replace(target)
       } catch (e) {
+        if (e?.code === 'mfa_required' || e?.code === 'mfa_invalid') {
+          this.error = e.message || 'Ingrese el código del autenticador'
+          this.paso = 'codigo'
+          this.mfaCode = ''
+          return
+        }
+        if (e?.code === 'mfa_setup' && e.access_token) {
+          this.tokenActivacion = e.access_token
+          this.semilla = await mfaSetup(e.access_token)
+          this.paso = 'activar'
+          this.mfaCode = ''
+          return
+        }
         this.error = e?.message || 'Usuario o contraseña incorrectos'
       } finally {
         this.loading = false

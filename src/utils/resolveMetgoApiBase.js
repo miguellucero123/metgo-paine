@@ -13,14 +13,12 @@ export function resolveMetgoApiBase() {
     return String(fromEnv).replace(/\/$/, '')
   }
 
+  if (import.meta.env.DEV && site.api?.localBase) {
+    return String(site.api.localBase).replace(/\/$/, '')
+  }
   if (typeof window !== 'undefined') {
     const host = window.location.hostname
-    if (
-      host.includes('netlify.app') ||
-      host.includes('pages.dev') ||
-      host === 'localhost' ||
-      host === '127.0.0.1'
-    ) {
+    if (host.includes('netlify.app') || host.includes('pages.dev')) {
       return RENDER_METGO_API
     }
   }

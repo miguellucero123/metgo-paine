@@ -36,15 +36,13 @@ export function clearSession() {
   localStorage.removeItem(USER_KEY)
 }
 
-async function request(path, { method = 'GET', body, auth = false, timeout = TIMEOUT_MS } = {}) {
+async function request(path, { method = 'GET', body, auth = false, bearer, timeout = TIMEOUT_MS } = {}) {
   const ctrl = new AbortController()
   const t = setTimeout(() => ctrl.abort(), timeout)
   const headers = { Accept: 'application/json' }
   if (body != null) headers['Content-Type'] = 'application/json'
-  if (auth) {
-    const token = getToken()
-    if (token) headers.Authorization = `Bearer ${token}`
-  }
+  const token = bearer || (auth ? getToken() : '')
+  if (token) headers.Authorization = `Bearer ${token}`
   try {
     const res = await fetch(`${resolveBaseURL()}${path}`, {
       method,
@@ -57,6 +55,7 @@ async function request(path, { method = 'GET', body, auth = false, timeout = TIM
       const err = new Error(data.error || `HTTP ${res.status}`)
       err.status = res.status
       err.data = data
+      err.code = data.code
       throw err
     }
     return data
@@ -65,11 +64,19 @@ async function request(path, { method = 'GET', body, auth = false, timeout = TIM
   }
 }
 
-export async function login(username, password) {
+export async function login(username, password, mfaCode = '') {
   return request('/auth/login', {
     method: 'POST',
-    body: { username, password, sitio: SITIO },
+    body: { username, password, sitio: SITIO, ...(mfaCode ? { mfa_code: mfaCode } : {}) },
   })
+}
+
+export async function mfaSetup(token) {
+  return request('/auth/mfa/setup', { method: 'POST', bearer: token })
+}
+
+export async function mfaActivar(token, code) {
+  return request('/auth/mfa/activar', { method: 'POST', body: { code }, bearer: token })
 }
 
 export async function fetchMe() {

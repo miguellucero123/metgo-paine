@@ -7,6 +7,7 @@ import authService, {
   hydrateFromStorage,
   logoutApi,
   ensureValidSession,
+  adoptLogin,
 } from '@services/authService';
 import { getToken, clearSession } from '@services/authApi.js';
 import { lugares as staticLugares } from '@/data/lugares.js';
@@ -213,15 +214,27 @@ export default createStore({
     }
   },
   actions: {
-    async login({ commit, state }, { username, email, password }) {
-      const result = await authService.login({ username, email, password });
+    async login({ commit, state }, { username, email, password, mfaCode }) {
+      const result = await authService.login({ username, email, password, mfaCode });
       if (!result.ok) {
-        throw new Error(result.message || 'Error al iniciar sesión');
+        const err = new Error(result.message || 'Error al iniciar sesión');
+        err.code = result.code;
+        err.access_token = result.access_token;
+        throw err;
       }
       commit('SET_USER', {
         ...result.user,
         favoriteIds: result.user.favoriteIds || [],
         preferences: result.user.preferences || { tempUnit: 'C', theme: 'dark' },
+      });
+      persistState(state);
+    },
+    adoptSession({ commit, state }, data) {
+      const user = adoptLogin(data);
+      commit('SET_USER', {
+        ...user,
+        favoriteIds: user.favoriteIds || [],
+        preferences: user.preferences || { tempUnit: 'C', theme: 'dark' },
       });
       persistState(state);
     },

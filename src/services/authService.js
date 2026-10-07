@@ -46,36 +46,50 @@ function findByEmail(email) {
  * Login JWT. Acepta { username, password } o { email, password } (username = email).
  * @returns {Promise<{ ok: boolean, user?: object, access_token?: string, message?: string }>}
  */
-export async function login({ username, email, password } = {}) {
+function userFromLogin(data, userId) {
+  return {
+    id: data.user?.id || data.user?.username || userId,
+    nombre: data.user?.nombre || data.user?.username || userId,
+    email: data.user?.email || userId,
+    username: data.user?.username || userId,
+    sitio: data.user?.sitio || SITIO,
+    role: data.user?.role,
+    favoriteIds: data.user?.favoriteIds || [],
+    preferences: data.user?.preferences || { tempUnit: 'C', theme: 'dark' },
+  }
+}
+
+export function adoptLogin(data) {
+  const userId = data.user?.email || data.user?.username || ''
+  setSession(data.access_token, data.user)
+  return userFromLogin(data, userId)
+}
+
+export async function login({ username, email, password, mfaCode } = {}) {
   const userId = String(username || email || '').trim()
   if (!userId || !password) {
-    return { ok: false, message: 'Usuario y contraseña requeridos' }
+    return { ok: false, message: 'Correo y contraseña requeridos' }
   }
 
   await wakeApi()
 
   try {
-    const data = await apiLogin(userId, password)
-    if (data.user?.sitio != null && data.user.sitio !== SITIO) {
+    const data = await apiLogin(userId, password, mfaCode)
+    if (data.user?.mfa_setup_required) {
+      return { ok: false, code: 'mfa_setup', access_token: data.access_token, message: 'Active el doble factor' }
+    }
+    const sitio = data.user?.sitio
+    if (sitio && sitio !== SITIO) {
       return {
         ok: false,
-        message: `Este acceso es para el sitio ${data.user.sitio}, no ${SITIO}`,
+        message: `Este acceso es para el sitio ${sitio}, no ${SITIO}`,
       }
     }
     setSession(data.access_token, data.user)
-    const user = {
-      id: data.user?.id || data.user?.username || userId,
-      nombre: data.user?.nombre || data.user?.username || userId,
-      email: data.user?.email || userId,
-      username: data.user?.username || userId,
-      sitio: data.user?.sitio || SITIO,
-      role: data.user?.role,
-      favoriteIds: data.user?.favoriteIds || [],
-      preferences: data.user?.preferences || { tempUnit: 'C', theme: 'dark' },
-    }
+    const user = userFromLogin(data, userId)
     return { ok: true, user, access_token: data.access_token }
   } catch (e) {
-    return { ok: false, message: e?.message || 'Usuario o contraseña incorrectos' }
+    return { ok: false, code: e?.code, message: e?.message || 'Usuario o contraseña incorrectos' }
   }
 }
 
@@ -116,7 +130,7 @@ export async function ensureValidSession() {
   if (!token) return null
   try {
     const me = await fetchMe()
-    if (me?.sitio != null && me.sitio !== SITIO) {
+    if (me?.sitio && me.sitio !== SITIO) {
       clearSession()
       return null
     }
